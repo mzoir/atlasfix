@@ -1,0 +1,41 @@
+.hero-content {
+align-items: center;
+justify-items: center;
+border: 6px solid  rgb(240, 240, 240);
+margin-left: 10%;
+margin-right: 10%;
+margin-top: 10%;
+}
+
+
+.hero-badge{
+color: aliceblue;
+}
+
+.hero-title{
+color: white;
+
+}
+.hero-badge{
+padding-top: 1%;
+
+}
+
+
+.hero-buttons{
+
+    
+padding-top: 1%;
+}
+
+.hero-trust{
+padding-top: 3% ;
+padding-bottom: 1%;
+
+}
+.btn-primary{
+  margin: 5px;
+  
+
+
+}

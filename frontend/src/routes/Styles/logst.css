@@ -1,0 +1,144 @@
+/* ===== LOGIN PAGE BACKGROUND ===== */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: linear-gradient(
+    135deg,
+    #1e3c72,
+    #2a5298,
+    #6a11cb
+  );
+
+  position: relative;
+  overflow: hidden;
+}
+
+/* decorative circles (FIXED) */
+.login-page::before,
+.login-page::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.25;
+  pointer-events: none; /* 🔥 FIX: prevents blocking inputs */
+}
+
+.login-page::before {
+  width: 400px;
+  height: 400px;
+  background: white;
+  top: -120px;
+  left: -120px;
+}
+
+.login-page::after {
+  width: 300px;
+  height: 300px;
+  background: #00d4ff;
+  bottom: -100px;
+  right: -100px;
+}
+
+/* ===== LOGIN FORM ===== */
+.login-form {
+  position: relative;
+  z-index: 2;
+
+  padding: 30px;
+  width: 320px;
+
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* title */
+.login-form h2 {
+  margin-bottom: 20px;
+  text-align: center;
+  color: #1e3c72;
+}
+
+/* inputs */
+.email1,
+.email2 {
+  width: 200px;
+  height: 35px;
+  padding: 8px;
+  margin: 8px 0;
+
+  border: 1px solid #999;
+  border-radius: 5px;
+  outline: none;
+}
+
+.email1:focus,
+.email2:focus {
+  border-color: #2563eb;
+}
+
+/* button */
+.btn1 {
+  width: 200px;
+  height: 35px;
+  margin-top: 12px;
+
+  background: linear-gradient(90deg, #2563eb, #1e40af);
+  color: white;
+
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn1:hover {
+  opacity: 0.9;
+}
+
+/* link */
+.link-text {
+  margin-top: 10px;
+}
+
+.link-text a {
+  color: #2563eb;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.link-text a:hover {
+  text-decoration: underline;
+}
+.profile-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+}
+
+.profile-card {
+  width: min(520px, 92vw);
+  background: rgb(199, 17, 17);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(250, 248, 245, 0);
+}
+
+.profile-logout {
+  margin-top: 16px;
+  width: 100%;
+  height: 40px;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}

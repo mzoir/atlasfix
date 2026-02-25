@@ -1,0 +1,238 @@
+/* ===== header sizing ===== */
+.header-frame{
+  height: 102px;
+  background: transparent !important;
+}
+
+
+header.header-frame.fixed-top{
+  background: transparent !important;
+}
+
+/* container width like figma 1440 but responsive */
+.header-inner{
+  max-width: 1440px;
+}
+
+/* logo */
+.logo-img{
+  height: 37px;
+  width: auto;
+}
+/* ====== Base for any section that has decorations ====== */
+.atlas-section{
+  position: relative;
+  overflow: hidden;
+}
+
+/* content always above backgrounds */
+.atlas-section > *{
+  position: relative;
+  z-index: 2;
+}
+
+
+/* Background image */
+
+
+
+/* ====== Pattern decorations (left/right) ====== */
+.pattern-lr::before,
+.pattern-lr::after{
+  content:"";
+  position:absolute;
+  width: 420px;
+  height: 420px;
+  background-image: var(--pattern-bg);
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: .75;
+  z-index: 0;
+  pointer-events:none;
+}
+
+.pattern-lr::before{
+  left: -120px;
+  top: 40px;
+}
+
+.pattern-lr::after{
+  right: -140px;
+  bottom: 40px;
+}
+
+/* ====== Light brick texture section ====== */
+.brick-bg::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image: var(--brick-bg);
+  background-repeat: repeat;
+  background-size: 900px auto; /* adjust */
+  opacity: .18;
+  z-index: 0;
+  pointer-events:none;
+}
+
+
+/* nav pill look (same as yours) */
+.nav-pill{
+  border-radius: 10px;
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.12);
+  padding: 0 18px;
+  gap: 0;
+}
+.nav-item-link{
+  font-size: 15px;
+  font-weight: 600;
+  color: rgba(0,0,0,0.78);
+  padding: 10px 16px;
+  white-space: nowrap;
+}
+.nav-item-link.router-link-active,
+.nav-item-link.router-link-exact-active{
+  color:#fc5a15;
+}
+.sep{
+  width:1px;
+  height:18px;
+  background: rgba(0,0,0,0.22);
+  align-self:center;
+  margin: 0 4px;
+}
+
+/* right actions */
+.btn-icon{
+  width:44px;
+  height:44px;
+  border:0;
+  background:transparent;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  color:#fc5a15;
+}
+
+/* buttons same style */
+.btn-atlas{
+  height:47px;
+  padding: 0 18px;
+  border-radius: 12px;
+  font-weight:700;
+  font-size:14px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
+}
+.btn-login{
+  background: transparent;
+  color:#fc5a15;
+  border: 1px solid rgba(252,90,21,0.85);
+}
+.btn-signup{
+  background:#fc5a15;
+  color:#fff;
+  border:1px solid transparent;
+  box-shadow: 0 10px 18px rgba(252,90,21,0.35);
+}
+
+.lang{
+  height:26px;
+  border-radius:20px;
+  border:0.5px solid rgba(0,0,0,0.25);
+  background: rgba(255,255,255,0.7);
+  cursor:pointer;
+  font-weight:700;
+  color: rgba(0,0,0,0.78);
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding: 0 10px;
+}
+.flag{
+  width:16px;height:10px;border-radius:2px;display:inline-block;
+}
+.flag.fr{
+  background: linear-gradient(90deg,#1f3cff 0 33%,#fff 33% 66%,#ff3b30 66% 100%);
+}
+
+
+.hero-overlay{
+  position:absolute; inset:0;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.55) 55%, rgba(255,255,255,0.92) 100%),
+    radial-gradient(60% 70% at 50% 35%, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.00) 55%);
+}
+.hero-container{
+  position: relative;
+  z-index: 2;
+  padding-top: 90px;
+  padding-bottom: 40px;
+}
+.hero-content{
+  max-width: 907px;
+}
+.hero-title{
+  margin:0;
+  font-size: clamp(34px, 4vw, 56px);
+  line-height: 1.08;
+  font-weight:800;
+  color:#0b0b0b;
+  letter-spacing:-0.5px;
+  text-shadow: 0 3px 0 rgba(0,0,0,0.08);
+}
+.accent{ color:#ff5a17; }
+.hero-subtitle{
+  margin: 16px 0 0;
+  font-size: 16px;
+  line-height:1.7;
+  color: rgba(0,0,0,0.55);
+  font-weight:500;
+}
+
+/* search */
+.search-wrap{
+  margin-top: 24px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.92);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.12);
+  padding: 10px 14px;
+}
+.divider{
+  width:1px;
+  background: rgba(0,0,0,0.18);
+}
+.placeholder{
+  color: rgba(0,0,0,0.45);
+  font-weight:500;
+  font-size:14px;
+}
+.search-btn{
+  height: 52px;
+  padding: 0 26px;
+  border-radius:12px;
+  border:none;
+  background:#ff5a17;
+  color:#fff;
+  font-weight:700;
+  font-size:15px;
+  box-shadow: 0 10px 18px rgba(255,90,23,0.35);
+}
+html, body {
+  margin: 0;
+  padding: 0;
+}
+.hero-frame{
+  width: min(1440px, 100%) !important;
+}
+body{
+  background: transparent !important;
+}
+
+/* trust */
+.trust-item{ text-align:center; }
+.trust-icon{ color:#ff5a17; display:flex; justify-content:center; }
+.trust-text{ color: rgba(0,0,0,0.55); font-weight:600; }

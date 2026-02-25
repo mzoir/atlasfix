@@ -1,0 +1,80 @@
+:root {
+  --navbar-height: 60px;
+  --navbar-blur: 10px;
+  --navbar-bg-opacity: 0.85;
+}
+
+.page {
+  
+  background: linear-gradient(
+    135deg,
+    #1e3c72,
+    #2a5298,
+    #6a11cb
+  );
+
+  position: relative;
+  overflow: hidden;
+
+}
+.right-nav {
+  margin-left: 35%;
+  display: flex;
+  align-items: end;
+  justify-content: flex-end; /* aligne les éléments */
+  gap: 24px
+}
+/* LOGO */
+.img {
+  width: 200px;
+  height: auto;             /* évite la déformation */
+}
+
+/* LINKS */
+.text-a {
+  text-decoration: none;    /* ❌ red → invalide */
+  color: #0f172a;
+  font-weight: 600;
+}
+
+/* NAVBAR */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: var(--navbar-height);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 0 80px;           /* ❌ 0% → inutile */
+  
+  background: rgba(255, 255, 255, var(--navbar-bg-opacity));
+  backdrop-filter: blur(var(--navbar-blur));
+  -webkit-backdrop-filter: blur(var(--navbar-blur));
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  z-index: 1000;
+}
+
+/* Hover */
+.navbar a:hover {
+  color: #2563eb;
+}
+
+/* BUTTON */
+.btn {
+  background-color: blue;
+  color: white;
+  border-radius: 11%;
+  font-weight: 700;          /* ❌ 700px → invalide */
+  padding: 8px 14px;
+  border: none;
+  cursor: pointer;
+}
+
+/* PAGE CONTENT */
+.page {
+  padding-top: calc(var(--navbar-height) + 16px);
+  padding-left: 24px;
+  padding-right: 24px;
+}
