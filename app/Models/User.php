@@ -37,6 +37,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'phone_verification_code',
         'phone_verification_expires_at',
         'phone_verified_at',
+        'role',
 
 
     ];
@@ -84,5 +85,38 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     return $this->hasMany(Request::class);
 }
+public function sentMessages()
+{
+    return $this->hasMany(Message::class, 'sender_id');
+}
+
+public function receivedMessages()
+{
+    return $this->hasMany(Message::class, 'receiver_id');
+}
+// -- Réservations en tant que CLIENT --
+public function reservationsClient()
+{
+    return $this->hasMany(Reservation::class, 'client_id');
+}
+
+// -- Réservations en tant qu'ARTISAN --
+public function reservationsArtisan()
+{
+    return $this->hasMany(Reservation::class, 'artisan_id');
+}
+
+// -- Avis laissés par ce client --
+public function avisLaisses()
+{
+    return $this->hasMany(Avis::class, 'client_id');
+}
+
+// -- Avis reçus par cet artisan --
+public function avisRecus()
+{
+    return $this->hasMany(Avis::class, 'artisan_id');
+}
+
 }
 

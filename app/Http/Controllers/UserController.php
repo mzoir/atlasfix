@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\EmailOtpMail;
+use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -51,12 +52,10 @@ class UserController extends Controller
             'phone_verified_at' => null,
         ]);
 
-        // Email OTP
         $emailCode = (string) random_int(1000, 9999);
         $user->email_verification_code = $emailCode;
         $user->email_verification_expires_at = now()->addMinutes(10);
 
-        // Phone OTP
         $phoneCode = (string) random_int(1000, 9999);
         $user->phone_verification_code = $phoneCode;
         $user->phone_verification_expires_at = now()->addMinutes(10);
@@ -65,7 +64,6 @@ class UserController extends Controller
 
         Mail::to($user->email)->send(new EmailOtpMail($emailCode));
 
-
         return response()->json([
             'message' => 'OTP sent to email and phone',
             'temp_id' => $tempId,
@@ -73,74 +71,67 @@ class UserController extends Controller
             'phone_verified' => false,
         ], 201);
     }
-/**
- * ✅ RESEND EMAIL OTP (temp_id)
- * POST /api/register/artisan/resend-email
- */
-public function resendEmail(Request $request)
-{
-    $request->validate([
-        'temp_id' => 'required|string',
-    ]);
 
-    $u = $this->userByTempId($request->temp_id);
-    if (!$u) return response()->json(['message' => 'Invalid or expired temp_id'], 422);
+    /**
+     * RESEND EMAIL OTP (temp_id)
+     */
+    public function resendEmail(Request $request)
+    {
+        $request->validate([
+            'temp_id' => 'required|string',
+        ]);
 
-    // already verified
-    if ($u->email_verified_at) {
-        return response()->json(['message' => 'Email already verified', 'email_verified' => true], 200);
+        $u = $this->userByTempId($request->temp_id);
+        if (!$u) return response()->json(['message' => 'Invalid or expired temp_id'], 422);
+
+        if ($u->email_verified_at) {
+            return response()->json(['message' => 'Email already verified', 'email_verified' => true], 200);
+        }
+
+        $emailCode = (string) random_int(1000, 9999);
+        $u->email_verification_code = $emailCode;
+        $u->email_verification_expires_at = now()->addMinutes(10);
+        $u->save();
+
+        Mail::to($u->email)->send(new EmailOtpMail($emailCode));
+
+        return response()->json([
+            'message' => 'Email OTP resent',
+            'email_verified' => false,
+        ], 200);
     }
 
-    // generate new code
-    $emailCode = (string) random_int(1000, 9999);
-    $u->email_verification_code = $emailCode;
-    $u->email_verification_expires_at = now()->addMinutes(10);
-    $u->save();
+    /**
+     * RESEND PHONE OTP (temp_id)
+     */
+    public function resendPhone(Request $request)
+    {
+        $request->validate([
+            'temp_id' => 'required|string',
+        ]);
 
-    // send email
-    Mail::to($u->email)->send(new EmailOtpMail($emailCode));
+        $u = $this->userByTempId($request->temp_id);
+        if (!$u) return response()->json(['message' => 'Invalid or expired temp_id'], 422);
 
-    return response()->json([
-        'message' => 'Email OTP resent',
-        'email_verified' => false,
-    ], 200);
-}
+        if ($u->phone_verified_at) {
+            return response()->json(['message' => 'Phone already verified', 'phone_verified' => true], 200);
+        }
 
-/**
- * ✅ RESEND PHONE OTP (temp_id)
- * POST /api/register/artisan/resend-phone
- */
-public function resendPhone(Request $request)
-{
-    $request->validate([
-        'temp_id' => 'required|string',
-    ]);
+        $phoneCode = (string) random_int(1000, 9999);
+        $u->phone_verification_code = $phoneCode;
+        $u->phone_verification_expires_at = now()->addMinutes(10);
+        $u->save();
 
-    $u = $this->userByTempId($request->temp_id);
-    if (!$u) return response()->json(['message' => 'Invalid or expired temp_id'], 422);
+        $this->sendSms(new Request([
+            'to' => $u->phone,
+            'message' => "Votre code de vérification est : {$phoneCode}",
+        ]));
 
-    // already verified
-    if ($u->phone_verified_at) {
-        return response()->json(['message' => 'Phone already verified', 'phone_verified' => true], 200);
+        return response()->json([
+            'message' => 'Phone OTP resent',
+            'phone_verified' => false,
+        ], 200);
     }
-
-    // generate new code
-    $phoneCode = (string) random_int(1000, 9999);
-    $u->phone_verification_code = $phoneCode;
-    $u->phone_verification_expires_at = now()->addMinutes(10);
-    $u->save();
-
-    // send sms
-    $this->sendSms(new Request([
-        'to' => $u->phone,
-        'message' => "Votre code de vérification est : {$phoneCode}",
-    ]));
-
-    return response()->json([
-        'message' => 'Phone OTP resent',
-        'phone_verified' => false,
-    ], 200);
-}
 
     /**
      * STEP 2: Verify Email
@@ -211,7 +202,7 @@ public function resendPhone(Request $request)
     }
 
     /**
-     * STEP 4: Complete profile (basic info only)
+     * STEP 4: Set Password
      */
     public function setPassword(Request $request)
     {
@@ -251,57 +242,235 @@ public function resendPhone(Request $request)
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
         ])->post('https://m9mwg9.api.infobip.com/sms/2/text/advanced', [
-                    'messages' => [
-                        [
-                            'from' => 'ServiceSM',
-                            'destinations' => [['to' => $phone]],
-                            'text' => $message,
-                        ]
-                    ]
-                ]);
+            'messages' => [
+                [
+                    'from' => 'ServiceSM',
+                    'destinations' => [['to' => $phone]],
+                    'text' => $message,
+                ]
+            ]
+        ]);
 
         return $response->json();
     }
 
-
-public function googleRedirect()
-{
-    return Socialite::driver('google')
-        ->stateless()
-        ->with(['prompt' => 'select_account'])
-        ->redirect();
-}
-
-public function googleCallback()
-{
-    $googleUser = Socialite::driver('google')
-        ->stateless()
-        ->user();
-
-    // Update or create
-    $user = User::updateOrCreate(
-        ['email' => $googleUser->getEmail()],
-        [
-            'name' => $googleUser->getName() ?? 'User',
-            'google_id' => $googleUser->getId(),
-            'role' => 'user',
-            'abonnement' => 'free',
-        ]
-    );
-
-    // ✅ if password column is NOT nullable in DB, set random hash instead of null
-    if (!$user->password) {
-        $user->password = Hash::make(Str::random(32));
-        $user->save();
+    public function googleRedirect()
+    {
+        return Socialite::driver('google')
+            ->stateless()
+            ->with(['prompt' => 'select_account'])
+            ->redirect();
     }
 
-    $token = $user->createToken('multi-app')->plainTextToken;
+    public function googleCallback()
+    {
+        $googleUser = Socialite::driver('google')
+            ->stateless()
+            ->user();
 
-    // ✅ Redirect back to Vue with token
-    $frontend = env('FRONTEND_URL', 'http://127.0.0.1:8000');
-    return redirect($frontend . '?token=' . urlencode($token));
+        $user = User::updateOrCreate(
+            ['email' => $googleUser->getEmail()],
+            [
+                'name' => $googleUser->getName() ?? 'User',
+                'google_id' => $googleUser->getId(),
+                'role' => 'user',
+                'abonnement' => 'free',
+            ]
+        );
+
+        if (!$user->password) {
+            $user->password = Hash::make(Str::random(32));
+            $user->save();
+        }
+
+        $token = $user->createToken('multi-app')->plainTextToken;
+
+        $frontend = env('FRONTEND_URL', 'http://127.0.0.1:8000');
+        return redirect($frontend . '?token=' . urlencode($token));
+    }
+
+    // ==========================================
+    // 💬 MESSAGE METHODS
+    // ==========================================
+
+    /**
+     * Send a message
+     */
+    public function sendMessage(Request $request)
+    {
+        $request->validate([
+            'receiver_id' => 'required|exists:users,id',
+            'message'     => 'required|string',
+        ]);
+
+        $message = Message::create([
+            'sender_id'   => auth()->id(),
+            'receiver_id' => $request->receiver_id,
+            'message'     => $request->message,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Message sent successfully',
+            'data'    => $message,
+        ], 201);
+    }
+
+    /**
+     * Get conversation with a specific user
+     */
+    public function getConversation($userId)
+    {
+        $authId = auth()->id();
+
+        $messages = Message::where(function($q) use ($authId, $userId) {
+                $q->where('sender_id', $authId)->where('receiver_id', $userId);
+            })
+            ->orWhere(function($q) use ($authId, $userId) {
+                $q->where('sender_id', $userId)->where('receiver_id', $authId);
+            })
+            ->with(['sender', 'receiver'])
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data'    => $messages,
+        ]);
+    }
+
+    /**
+     * Get all sent messages
+     */
+    public function sentMessages()
+    {
+        $messages = auth()->user()
+            ->sentMessages()
+            ->with('receiver')
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data'    => $messages,
+        ]);
+    }
+
+    /**
+     * Get all received messages
+     */
+    public function receivedMessages()
+    {
+        $messages = auth()->user()
+            ->receivedMessages()
+            ->with('sender')
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data'    => $messages,
+        ]);
+    }
+
+    /**
+     * Mark message as read
+     */
+    public function markAsRead($id)
+    {
+        $message = Message::where('id', $id)
+            ->where('receiver_id', auth()->id())
+            ->firstOrFail();
+
+        $message->update(['is_read' => true]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Message marked as read',
+            'data'    => $message,
+        ]);
+    }
+
+    /**
+     * Get unread messages count
+     */
+    public function unreadCount()
+    {
+        $count = Message::where('receiver_id', auth()->id())
+            ->where('is_read', false)
+            ->count();
+
+        return response()->json([
+            'success'      => true,
+            'unread_count' => $count,
+        ]);
+    }
+    /**
+ * Get all conversations (inbox)
+ */
+public function allConversations()
+{
+    $authId = auth()->id();
+
+    $messages = Message::where('sender_id', $authId)
+        ->orWhere('receiver_id', $authId)
+        ->with(['sender', 'receiver'])
+        ->orderBy('created_at', 'desc')
+        ->get()
+        ->groupBy(function ($msg) use ($authId) {
+            // Group by the other person's ID
+            return $msg->sender_id == $authId ? $msg->receiver_id : $msg->sender_id;
+        })
+        ->map(function ($msgs) use ($authId) {
+            $lastMessage = $msgs->first();
+            $otherUser   = $lastMessage->sender_id == $authId
+                ? $lastMessage->receiver
+                : $lastMessage->sender;
+
+            return [
+                'user'          => $otherUser,
+                'last_message'  => $lastMessage->message,
+                'is_read'       => $lastMessage->is_read,
+                'date'          => $lastMessage->created_at,
+                'unread_count'  => $msgs->where('receiver_id', $authId)->where('is_read', false)->count(),
+            ];
+        })
+        ->values();
+
+    return response()->json([
+        'success' => true,
+        'data'    => $messages,
+    ]);
 }
 
 
+/**
+ * Update user profile
+ */
+public function update(Request $request)
+{
+    $user = auth()->user();
+
+    $data = $request->validate([
+        'name' => 'sometimes|string|max:255',
+        'email' => 'sometimes|email|max:255|unique:users,email,' . $user->id,
+        'phone' => 'sometimes|string|max:30|unique:users,phone,' . $user->id,
+        'ville' => 'nullable|string|max:30',
+        'date_of_birth' => 'nullable|date',
+        'password' => 'nullable|string|min:6|confirmed'
+    ]);
+
+    if (isset($data['password'])) {
+        $data['password'] = Hash::make($data['password']);
+    }
+
+    $user->update($data);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Profile updated successfully',
+        'user' => $user
+    ]);
+}
 
 }

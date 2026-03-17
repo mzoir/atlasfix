@@ -1,8 +1,8 @@
 <template>
-  <main class="app-main">
-    <RouterView />
-  </main>
-
+ <!-- layouts.vue template -->
+<main class="app-shell">   <!-- ✅ was app-main -->
+  <RouterView />
+</main>
 </template>
 
 <script setup>
@@ -16,7 +16,6 @@ import FooterBar from "./FooterBar.vue"
 
 /* keep page max width like figma */
 :global(.app-shell){
-  max-width: 1440px;
-  margin: 0 auto;
+  width: 100%;        /* ✅ full width */
 }
 </style>

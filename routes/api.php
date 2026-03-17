@@ -10,6 +10,8 @@ use App\Models\User;
 use App\Http\Controllers\UserController;
 use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\EmailOtpController;
+use App\Http\Controllers\Api\ReservationController;
+use App\Http\Controllers\Api\AvisController;
 
 /*
 |--------------------------------------------------------------------------
@@ -141,3 +143,67 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post  ('requests',             [RequestController::class, 'store']);
     Route::delete('requests/{serviceRequest}', [RequestController::class, 'destroy']);
 });
+
+
+Route::get('/artisans', [ArtisanController::class, 'index']);
+
+//MessageUser
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/messages/send',                 [UserController::class, 'sendMessage']);
+    Route::get('/messages/conversation/{userId}', [UserController::class, 'getConversation']);
+    Route::get('/messages/sent',                  [UserController::class, 'sentMessages']);
+    Route::get('/messages/received',              [UserController::class, 'receivedMessages']);
+    Route::put('/messages/{id}/read',             [UserController::class, 'markAsRead']);
+    Route::get('/messages/unread-count',          [UserController::class, 'unreadCount']);
+ Route::get('/messages/conversations', [UserController::class, 'allConversations']);
+
+    });
+Route::middleware('auth:sanctum')->get('/requests/all', [RequestController::class, 'all']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/artisan/messages/send',                 [ArtisanController::class, 'sendMessage']);
+    Route::get('/artisan/messages/conversation/{userId}', [ArtisanController::class, 'getConversation']);
+    Route::get('/artisan/messages/sent',                  [ArtisanController::class, 'sentMessages']);
+    Route::get('/artisan/messages/received',              [ArtisanController::class, 'receivedMessages']);
+    Route::put('/artisan/messages/{id}/read',             [ArtisanController::class, 'markAsRead']);
+    Route::get('/artisan/messages/unread-count',          [ArtisanController::class, 'unreadCount']);
+ Route::get('/artisan/messages/conversations', [ArtisanController::class, 'allConversations']);
+
+    });
+///           ==========================   ///////
+///                  Client  Update 
+//            =========================== /////////
+Route::middleware('auth:sanctum')->put('/user/update', [UserController::class, 'update']);
+
+
+
+
+
+
+
+
+
+
+////////// ============================================ /////////////
+///////////// Reserver 
+//                          Artisan                           //////////////
+/////////////================================================//////
+
+
+// Routes protégées (client connecté via Sanctum)
+Route::middleware('auth:sanctum')->group(function () {
+
+    // Réservations
+    Route::get('/reservations',                        [ReservationController::class, 'index']);
+    Route::post('/reservations',                       [ReservationController::class, 'store']);
+    Route::get('/reservations/{reservation}',          [ReservationController::class, 'show']);
+    Route::patch('/reservations/{reservation}/annuler',[ReservationController::class, 'annuler']);
+
+    // Avis (laisser / supprimer)
+    Route::post('/reservations/{reservation}/avis',    [AvisController::class, 'store']);
+    Route::delete('/avis/{avi}',                       [AvisController::class, 'destroy']);
+});
+
+// Avis publics d'un artisan (sans auth)
+Route::get('/artisans/{artisanId}/avis', [AvisController::class, 'indexArtisan']);

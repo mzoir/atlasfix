@@ -10,10 +10,13 @@ const Home = () => import("../components/pages/home.vue")
 const About = () => import("../components/about.vue")
 const Services = () => import("../components/service.vue")
 const Contact = () => import("../components/contact.vue")
-const FAQ = () => import("../components/about.vue")
 const Login = () => import("../components/Login.vue")
 const Sign = () => import("../components/choose.vue")
+const faq = () => import ("../components/faq.vue")
+const ArtisanProfile =  ( ) => import ("../components/pages/Artisanprofile.vue")
 
+const demandes =  ( ) => import ("../components/pages/mesdemandes.vue")
+const messages = () => import ('../components/pages/message.vue')
 // ✅ FIX: must be a function, not "import(...)"
 const CreateAccount = () => import("../components/createaccount.vue")
 
@@ -28,11 +31,13 @@ export default createRouter({
         { path: "about", component: About },
         { path: "services", component: Services },
         { path: "contact", component: Contact },
-        { path: "faq", component: FAQ },
         { path: "login", component: Login },
         { path: "choose", component: Sign },
         {path:"goprofile" , component: ProfilePage},
-         
+        {path:"faq" , component:faq },
+        { path: "artisan/:id", name: "artisan-profile", component: ArtisanProfile },
+          {path:"messages" , component:messages },
+          {path:"demandes" , component:demandes },
          {
            path: "/auth/callback",
            name: "auth-callback",

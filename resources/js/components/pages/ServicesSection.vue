@@ -1,5 +1,8 @@
 <template>
-  <section class="services-sec py-5">
+    <section class="services-sec py-5">
+
+<img :src="decor" class="services-decor" alt="">
+
     <div class="container-xxl app-shell px-3 px-md-5">
 
       <div class="text-center mb-4">
@@ -40,7 +43,7 @@
                 <div class="img-wrap">
                   <img class="w-100" :src="s.img" :alt="s.title" />
                   <div class="badge-bubble">
-                    <span class="badge-ico">{{ s.icon }}</span>
+                  <img :src="s.icon" class="badge-ico" alt="">
                   </div>
                 </div>
 
@@ -66,34 +69,42 @@ import img from "@/assets/dr.jpg"
 import img1 from "@/assets/plmobe.png"
 import img2 from  "@/assets/electr.jpg"
 import img3 from  "@/assets/rep.png"
+import decor from "@/assets/cp.png"
+import icon from "@/assets/icon.png"
+
+import icon1 from "@/assets/Icon1.png"
+
+import icon2 from "@/assets/Icon2.png"
+
+import icon3 from "@/assets/Icon4.png"
 
 const track = ref(null)
 
 const services = [
   {
     title: "Plomberie",
-    icon: "💧",
+    icon: icon,
     img: img,
   },
   {
     title: "Électricité",
-    icon: "⚡",
+    icon: icon1,
     img: img1,
   },
   {
     title: "Peinture",
-    icon: "🧽",
+    icon: icon2,
     img: img2,
   },
   {
     title: "Réparations générales",
-    icon: "🔧",
+    icon: icon3,
     img: img3,
   },
   
   {
     title: "Réparations générales",
-    icon: "🔧",
+    icon: icon3,
     img: img3,
   },
 ]
@@ -107,11 +118,23 @@ function scroll(dir) {
 
 <style scoped>
 /* ✅ IMPORTANT: no extra gap with previous section */
+
 .services-sec{
   background: #fff;
   margin: 0;
+  padding-bottom: 0 !important;
+  position: relative;
 }
 
+.services-decor{
+  position: absolute;
+  top: 60px;
+  left: 0;
+   width: clamp(360px, 18vw, 500px); /* responsive size */
+  opacity: 0.6;
+  pointer-events: none;
+    z-index: 0;
+}
 /* Title style same vibe */
 .sec-title{
   font-weight: 900;
@@ -137,51 +160,57 @@ function scroll(dir) {
 
 /* card look */
 .service-card{
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
   padding: 14px 14px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
   min-height: 220px;
-  transition: transform .15s ease, box-shadow .15s ease;
 }
-.service-card:hover{
-  transform: translateY(-2px);
-  box-shadow: 0 18px 34px rgba(0,0,0,0.10);
-}
-
 /* image */
 .img-wrap{
   width: 100%;
+  height : 155.52713012695312;
   position: relative;
 }
 .img-wrap img{
-  height: 120px;
+  height: 150px;
   object-fit: cover;
   border-radius: 10px;
 }
 
 /* bubble badge */
-.badge-bubble{
+/* container for the icon */
+.badge-bubble {
   position: absolute;
-  left: 50%;
-  bottom: -16px;
+  top : 130px;
+  bottom: 10px;               /* align to bottom of image */
+  left: 50%;               /* center horizontally */
   transform: translateX(-50%);
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
-  background: #fff;
-  border: 1px solid rgba(0,0,0,0.08);
-  box-shadow: 0 10px 18px rgba(0,0,0,0.08);
-  display: grid;
-  place-items: center;
+  background: transparent; /* remove white circle */
+  box-shadow: none;
+  width: auto;
+  height: auto;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center ;
+  z-index: 1;              /* make sure it's above the image */
 }
-.badge-ico{
-  color: #ff5a17;
-  font-size: 16px;
+
+/* the icon image itself */
+
+
+.badge-bubble img {
+  width: 130px;               /* size of your icon */
+  height: 130px;
+  object-fit: contain;
+  opacity: 0.9;         /* make it semi-transparent */
+  transition: opacity 0.3s ease;   
+               /* fully visible */
 }
 
 /* name */
@@ -234,4 +263,12 @@ function scroll(dir) {
 }
 .nav-arrow.start{ left: -10px; }
 .nav-arrow.end{ right: -10px; }
+.services-sec {
+  background: #fff;
+  margin: 0;
+  padding-bottom: 0 !important;  /* ✅ add this */
+}
+
+
+
 </style>

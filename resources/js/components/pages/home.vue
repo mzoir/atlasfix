@@ -134,4 +134,13 @@ const brickStyle   = { '--brick-bg': `url(${brick})` }
   z-index: 0;
   pointer-events:none;
 }
+/* ✅ Fix text getting cut by header */
+.hero1440-content {
+  position: relative;
+  z-index: 2;
+  padding-top: 120px;  /* was 150px — adjust if needed */
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+}
 </style>

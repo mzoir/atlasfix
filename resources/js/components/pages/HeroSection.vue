@@ -153,14 +153,9 @@ import heroBg from "@/assets/hero-bg.png"
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 244, 235, 0.35) 0%,
-    rgba(255, 235, 220, 0.55) 40%,
-    rgba(255, 225, 205, 0.75) 70%,
-    rgba(255, 215, 190, 0.92) 90%,
-    rgba(255, 210, 185, 1) 100%
-  );
+  background: 
+    linear-gradient(180deg, rgba(255, 255, 255, 0) 44.57%, #FFFFFF 100%),
+    linear-gradient(135deg, rgba(234, 235, 237, 0.8) 0%, rgba(192, 112, 37, 0.5) 100%);
 }
 
 /* content above overlay */
@@ -186,10 +181,15 @@ import heroBg from "@/assets/hero-bg.png"
 .hero-subtitle {
   margin: 18px auto 0;
   max-width: 980px;
-  font-size: 16px;
-  line-height: 1.7;
-  color: rgba(0, 0, 0, 0.55);
-  font-weight: 500;
+  font-family: Poppins;
+font-weight: 400;
+font-style: Regular;
+font-size: 20px;
+leading-trim: NONE;
+line-height: 35px;
+letter-spacing: -0.44px;
+text-align: center;
+
 }
 
 /* search bar */
@@ -244,12 +244,18 @@ import heroBg from "@/assets/hero-bg.png"
 .search-btn {
   height: 52px;
   padding: 0 26px;
+  font-family: Poppins;
+font-weight: 500;
+font-style: Medium;
+font-size: 18px;
+line-height: 27.38px;
+letter-spacing: -0.36px;
+text-align: center;
+
   border-radius: 12px;
   border: none;
   background: #ff5a17;
   color: #fff;
-  font-weight: 800;
-  font-size: 15px;
   cursor: pointer;
   box-shadow: 0 10px 18px rgba(255, 90, 23, 0.35);
   flex: 0 0 auto;
@@ -289,13 +295,41 @@ import heroBg from "@/assets/hero-bg.png"
 }
 
 .trust-text{
-  color: rgba(0,0,0,0.55);
-  font-weight: 700;
+  font-family: OpenSans;
+font-weight: 400;
+font-style: Regular;
+font-size: 19.49px;
+line-height: 27.85px;
+letter-spacing: -0.21px;
+text-align: center;
+  color: rgba(88,89,91,1);
+  
 }
 
 
-.trust-text {
-  color: rgba(0, 0, 0, 0.55);
-  font-weight: 700;
+
+/* ✅ Remove the centering wrapper, make frame full width */
+.hero-test-sec {
+  width: 100%;
 }
+
+.hero1440-frame {
+  width: 100%;          /* ✅ always full width */
+  min-height: 726px;
+  position: relative;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* ✅ Cap only the TEXT CONTENT, not the background */
+.hero1440-content {
+  max-width: 1440px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+  padding-top: 150px;
+}
+
 </style>

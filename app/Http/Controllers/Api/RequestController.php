@@ -45,4 +45,12 @@ class RequestController extends Controller
 
         return response()->json(['message' => 'Demande supprimée.']);
     }
+    public function all(): JsonResponse
+{
+    $requests = \App\Models\Request::with('user')
+        ->latest()
+        ->get();
+
+    return response()->json(['data' => $requests]);
+}
 }

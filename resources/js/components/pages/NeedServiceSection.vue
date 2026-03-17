@@ -17,7 +17,7 @@
 
             <div class="d-grid gap-3 mb-4">
               <div class="step">
-                <div class="step-ico">📄</div>
+                <img :src="icon1" class="step-ico" />
                 <div>
                   <div class="step-name">Décrivez votre besoin</div>
                   <div class="step-sub">Dites-nous ce qui doit être fait et pour quand.</div>
@@ -25,7 +25,7 @@
               </div>
 
               <div class="step">
-                <div class="step-ico">🕒</div>
+                <img :src="icon2" class="step-ico" />
                 <div>
                   <div class="step-name">Recevez des devis</div>
                   <div class="step-sub">Obtenez des réponses de prestataires intéressés.</div>
@@ -33,7 +33,7 @@
               </div>
 
               <div class="step">
-                <div class="step-ico">✅</div>
+                <img :src="icon3" class="step-ico" />
                 <div>
                   <div class="step-name">Choisissez et réservez</div>
                   <div class="step-sub">Comparez les devis et engagez le professionnel le plus adapté.</div>
@@ -72,98 +72,100 @@
 </template>
 
 <script setup>
-// ✅ Use your tools image (best):
-// Put it in: src/assets/tools.png
-// then do:
-// import toolsImg from "@/assets/tools.png"
-// const bg = toolsImg
-
-// TEMP: use any URL (replace with your hosted / assets)
 import bg from "@/assets/a.png"
-
-
+import icon1 from "@/assets/Container0.png"
+import icon2 from "@/assets/Container4.png"
+import icon3 from "@/assets/Container1.png"
 </script>
 
 <style scoped>
-.need-sec{
-  background: #eef1f3;
+.need-sec {
+  background: #fff;
 }
 
 /* main card */
-.need-shell{
+.need-shell {
   border-radius: 16px;
-  box-shadow: 0 18px 45px rgba(0,0,0,0.18);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
   background: #fff;
   overflow: hidden;
 }
 
-/* ✅ Desktop exact layout: left flex + right fixed */
-.need-row{
+/* ── Row layout ── */
+.need-row {
   display: flex;
-  flex-direction: column; /* mobile stack */
+  flex-direction: column;
 }
 
-/* LEFT */
-.need-left{
+@media (min-width: 992px) {
+  .need-row {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0; /* no gap — panels are flush */
+  }
+}
+
+/* ── LEFT ── */
+.need-left {
   background: #fff;
   padding: 34px 30px;
 }
-@media (min-width: 992px){
-  .need-row{
-    flex-direction: row;               /* desktop 2 columns */
-    gap: 30.15px;                      /* ✅ Figma gap */
-    align-items: stretch;
-  }
 
-  .need-left{
-    flex: 1;                           /* left takes remaining space */
+@media (min-width: 992px) {
+  .need-left {
+    flex: 1;
     padding: 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 }
 
-.need-title{
+.need-title {
   font-weight: 900;
   font-size: 22px;
   color: #111;
 }
-.need-desc{
-  color: rgba(0,0,0,0.55);
+
+.need-desc {
+  color: rgba(0, 0, 0, 0.55);
   font-weight: 700;
   font-size: 13px;
   line-height: 1.7;
 }
 
 /* steps */
-.step{
+.step {
   display: flex;
   gap: 14px;
   align-items: flex-start;
 }
-.step-ico{
+
+.step-ico {
   width: 46px;
   height: 46px;
   border-radius: 12px;
-  border: 1px solid rgba(255,90,23,0.35);
-  display: grid;
-  color: orange;
-  place-items: center;
-  font-size: 18px;
+  border: 1px solid rgba(255, 90, 23, 0.35);
+  flex-shrink: 0;
+  object-fit: contain;
 }
-.step-name{
+
+.step-name {
   font-weight: 900;
-  color: rgba(0,0,0,0.78);
+  color: rgba(0, 0, 0, 0.78);
   font-size: 14px;
 }
-.step-sub{
+
+.step-sub {
   margin-top: 2px;
-  color: rgba(0,0,0,0.55);
+  color: rgba(0, 0, 0, 0.55);
   font-weight: 700;
   font-size: 12px;
   line-height: 1.5;
 }
 
 /* CTA */
-.need-cta{
+.need-cta {
   height: 44px;
   padding: 0 22px;
   border-radius: 10px;
@@ -171,81 +173,96 @@ import bg from "@/assets/a.png"
   background: #ff5a17;
   color: #fff;
   font-weight: 900;
-  box-shadow: 0 10px 22px rgba(255,90,23,0.25);
+  font-size: 14px;
+  box-shadow: 0 10px 22px rgba(255, 90, 23, 0.25);
+  width: fit-content;
 }
-.need-cta:hover{ background: #ff4a05; }
 
-/* RIGHT panel */
-.need-right{
-  position: relative;
+.need-cta:hover {
+  background: #ff4a05;
+}
+
+/* ── RIGHT panel ── */
+.need-right {
+  position: relative;           /* required for overlay + content positioning */
   background-size: cover;
   background-position: center;
-  color: #fff;
-  min-height: 260px; /* mobile */
+  background-repeat: no-repeat;
+  min-height: 300px;            /* mobile fallback height */
 }
 
-/* ✅ EXACT figma dimensions on desktop */
-@media (min-width: 992px){
-  .need-right{
-    width: 571.924560546875px;         /* ✅ Figma width */
-    height: 490.8940734863281px;       /* ✅ Figma height */
-    flex: 0 0 auto;
+@media (min-width: 992px) {
+  .need-right {
+    flex: 0 0 42%;
+    max-width: 572px;
+    min-height: 491px;
   }
 }
 
-/* overlay */
-.right-overlay{
+/* dark overlay on top of the background image */
+.right-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.55);
+  background: rgba(0, 0, 0, 0.58);  /* matches screenshot darkness */
+  border-radius: 0;
 }
 
-/* content padding */
-.right-content{
+/* content sits above overlay */
+.right-content {
   position: relative;
   z-index: 1;
   padding: 34px 26px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
-@media (min-width: 992px){
-  .right-content{
-    padding-top: 44px;
-    padding-bottom: 44px;
-    padding-right: 44px;
-    padding-left: 45.23px;             /* ✅ Figma padding-left */
+
+@media (min-width: 992px) {
+  .right-content {
+    padding: 100px 44px 44px 45px;
   }
 }
 
-.right-pill{
+.right-pill {
   display: inline-block;
   background: #ff5a17;
   color: #fff;
   font-weight: 900;
-  padding: 10px 16px;
+  padding: 10px 18px;
   border-radius: 999px;
   font-size: 13px;
+  width: fit-content;
 }
 
-.checks{ display: grid; gap: 14px; }
+/* checklist */
+.checks {
+  display: grid;
+  gap: 16px;
+}
 
-.check-item{
+.check-item {
   position: relative;
-  padding-left: 28px;
-  color: rgba(255,255,255,0.9);
+  padding-left: 32px;
+  color: rgba(255, 255, 255, 0.92);
   font-weight: 800;
   font-size: 13px;
   line-height: 1.5;
 }
-.check-item::before{
+
+.check-item::before {
   content: "✓";
   position: absolute;
   left: 0;
   top: 0;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 999px;
-  border: 2px solid rgba(255,255,255,0.9);
+  border: 2px solid rgba(255, 255, 255, 0.85);
   display: grid;
   place-items: center;
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 900;
+  color: #fff;
 }
 </style>
