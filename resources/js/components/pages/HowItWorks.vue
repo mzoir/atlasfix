@@ -71,7 +71,7 @@ import evaluate  from "@/assets/Container (18).png"
   background-color: #fff;
   background-repeat: no-repeat;
   background-position: bottom center;
-  background-size: 100% 45%;
+  background-size: cover;
 }
 
 h2 {
@@ -112,13 +112,13 @@ h2 {
 /* orange circle background */
 
 .step-img {
+
   position: relative;
   z-index: 1;
   width: 90px;
   height: 90px;
   object-fit: contain;
   padding: 14px;
-  border-radius: 999px;
 }
 
 /* numbered badge top-right */

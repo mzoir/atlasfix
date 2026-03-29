@@ -20,10 +20,9 @@ use App\Http\Controllers\Api\AvisController;
 */
 
 // ✅ Register client
-Route::post('/register/client', [UserController::class, 'register']
+Route::post('/register/client', [UserController::class, 'register']);
+Route::post('/register/artisan/debug-upload', [ArtisanController::class, 'debugUpload']);
 
-
-);;
 Route::post('/test-sms', [ArtisanController::class, 'sendSms']);
 
 Route::post('/email/send-otp', [EmailOtpController::class, 'send']);

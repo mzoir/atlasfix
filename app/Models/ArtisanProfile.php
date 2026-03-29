@@ -21,9 +21,11 @@ class ArtisanProfile extends Model
         'phone_verified_at',
         'phone_verification_code',
         'phone_verification_expires_at',
+         'portfolio_images',  // ← ADD THIS
     ];
 
     protected $casts = [
+        'portfolio_images' => 'array',
         'phone_verified_at' => 'datetime',
         'phone_verification_expires_at' => 'datetime',
     ];

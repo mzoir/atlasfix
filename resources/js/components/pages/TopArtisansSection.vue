@@ -10,8 +10,8 @@
       <!-- Loading skeletons -->
       <div v-if="loading" class="position-relative">
         <div class="track">
-          <div class="row flex-nowrap g-4 m-0">
-            <div class="col-11 col-sm-7 col-lg-4 p-0" v-for="i in 4" :key="i">
+          <div class="cards-row">
+            <div class="card-col" v-for="i in 3" :key="i">
               <article class="aCard h-100">
                 <div class="aTop d-flex gap-3">
                   <div class="aAvatar skel"></div>
@@ -26,8 +26,6 @@
                   <div class="skel skel-line long"></div>
                   <div class="skel skel-line long"></div>
                   <div class="skel skel-line medium"></div>
-                  <div class="skel skel-line long"></div>
-                  <div class="skel skel-line medium"></div>
                 </div>
               </article>
             </div>
@@ -38,7 +36,9 @@
       <!-- Error -->
       <div v-else-if="error" class="py-5 text-center">
         <p style="color:rgba(31,42,68,0.55); font-weight:800;">{{ error }}</p>
-        <button class="btnP solid px-4" style="width:auto; height:38px; border-radius:999px;" @click="fetchArtisans">Réessayer</button>
+        <button class="btnP solid px-4" style="width:auto;height:38px;border-radius:999px;" @click="fetchArtisans">
+          Réessayer
+        </button>
       </div>
 
       <!-- Cards -->
@@ -50,8 +50,8 @@
 
         <!-- track -->
         <div ref="track" class="track" @scroll="onScroll">
-          <div class="row flex-nowrap g-4 m-0">
-            <div class="col-11 col-sm-7 col-lg-4 p-0" v-for="a in artisans" :key="a.id">
+          <div class="cards-row">
+            <div class="card-col" v-for="a in artisans" :key="a.id">
               <article class="aCard h-100">
 
                 <!-- header -->
@@ -74,14 +74,11 @@
                       <div class="aName">{{ a.name || (a.first_name + ' ' + a.last_name) }}</div>
                       <span v-if="a.verified || a.is_verified" class="verify">✓</span>
                     </div>
-
-                    <div class="aSpec">{{ a.specialty || a.service || a.metier || 'Artisan' }}</div>
-
+                    <div class="aSpec">{{ a.specialty || a.speciality || a.service || a.metier || 'Artisan' }}</div>
                     <div class="aLoc d-flex align-items-center gap-2">
                       <span class="pin">⦿</span>
                       <span>{{ a.city || a.ville || '—' }}</span>
                     </div>
-
                     <div class="aRate d-flex align-items-center gap-2">
                       <span class="star">★</span>
                       <span class="rateTxt">{{ formatRating(a.rating) }}/5</span>
@@ -120,10 +117,10 @@
           </div>
         </div>
 
-        <!-- dots reactive -->
+        <!-- dots -->
         <div class="dots mt-4 d-flex justify-content-center gap-2">
           <span
-            v-for="(a, i) in artisans"
+            v-for="(_, i) in dotCount"
             :key="i"
             class="dot"
             :class="{ active: i === activeDot }"
@@ -138,10 +135,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-const router = useRouter()
 
+const router   = useRouter()
 const API_BASE = 'http://127.0.0.1:8000/api'
 
 const track     = ref(null)
@@ -150,7 +147,12 @@ const loading   = ref(true)
 const error     = ref(null)
 const activeDot = ref(0)
 
-/* ── Fetch ──────────────────────────────────────────── */
+const CARDS_PER_PAGE = 3
+
+// one dot per page of 3 cards
+const dotCount = computed(() => Math.ceil(artisans.value.length / CARDS_PER_PAGE))
+
+/* ── Fetch ───────────────────────────────────────────────────── */
 async function fetchArtisans() {
   loading.value = true
   error.value   = null
@@ -158,12 +160,9 @@ async function fetchArtisans() {
     const res  = await fetch(`${API_BASE}/artisans`)
     if (!res.ok) throw new Error(`Erreur serveur (${res.status})`)
     const data = await res.json()
-
     const list = Array.isArray(data) ? data : (data.data ?? data.artisans ?? [])
-
     artisans.value = [...list]
       .sort((a, b) => (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0))
-      .slice(0, 4)
   } catch (e) {
     error.value = e.message || 'Impossible de charger les artisans.'
   } finally {
@@ -171,27 +170,31 @@ async function fetchArtisans() {
   }
 }
 
-/* ── Scroll helpers ─────────────────────────────────── */
-function scroll(dir) {
-  if (!track.value) return
-  track.value.scrollBy({ left: dir * 380, behavior: 'smooth' })
+/* ── Scroll helpers ──────────────────────────────────────────── */
+function getPageWidth() {
+  if (!track.value) return 0
+  // width of 3 cards + their gaps = one full page
+  return track.value.clientWidth
 }
 
-function scrollToIndex(i) {
+function scroll(dir) {
   if (!track.value) return
-  const card = track.value.querySelector('.col-11')
-  if (!card) return
-  track.value.scrollTo({ left: i * (card.offsetWidth + 24), behavior: 'smooth' })
+  track.value.scrollBy({ left: dir * getPageWidth(), behavior: 'smooth' })
+}
+
+function scrollToIndex(pageIndex) {
+  if (!track.value) return
+  track.value.scrollTo({ left: pageIndex * getPageWidth(), behavior: 'smooth' })
 }
 
 function onScroll() {
   if (!track.value) return
-  const card = track.value.querySelector('.col-11')
-  if (!card) return
-  activeDot.value = Math.round(track.value.scrollLeft / (card.offsetWidth + 24))
+  const pageWidth = getPageWidth()
+  if (!pageWidth) return
+  activeDot.value = Math.round(track.value.scrollLeft / pageWidth)
 }
 
-/* ── Helpers ────────────────────────────────────────── */
+/* ── Helpers ─────────────────────────────────────────────────── */
 function initials(name = '') {
   return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'A'
 }
@@ -215,60 +218,98 @@ onMounted(fetchArtisans)
 <style scoped>
 .best-sec {
   background: #fff;
+   padding-left: 100px;
+  padding-right: 100px;
 }
 
-/* title */
 .best-title {
-  font-weight: 900;
-  font-size: clamp(28px, 3vw, 44px);
-  color: #111;
+  font-family: Poppins, sans-serif;
+ 
+  font-weight: 500;
+  font-size: 40px;
+  line-height: 30px;
+  letter-spacing: -0.45px;
+  color: #0A0A0A;
 }
+
 .best-sub {
   color: rgba(0,0,0,0.55);
-  font-weight: 700;
+  font-family: Poppins, sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 24px;
+  letter-spacing: -0.31px;
 }
 
-/* track */
+/* ── Track & cards layout ── */
 .track {
   overflow-x: auto;
   overflow-y: hidden;
   scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-  padding: 10px 4px;
+  padding: 12px 2px;
   scrollbar-width: none;
 }
 .track::-webkit-scrollbar { display: none; }
 
-/* card */
+/* 3 equal columns with gap, centered */
+.cards-row {
+  display: flex;
+  gap: 12px;               /* space between cards */
+  width: max-content;
+}
+
+.card-col {
+  /* exactly 1/3 of the track minus gaps */
+  width: calc((100vw - 48px - 32px) / 3);  /* viewport - container padding - gaps */
+  max-width: 340px;
+  min-width: 260px;
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+@media (max-width: 991px) {
+  .card-col {
+    width: calc((100vw - 48px) / 1.2);
+    max-width: 420px;
+  }
+}
+
+@media (max-width: 575px) {
+  .card-col {
+    width: 85vw;
+    max-width: 340px;
+  }
+}
+
+/* ── Card ── */
 .aCard {
   background: #fff;
   border-radius: 16px;
-  box-shadow: 0 14px 30px rgba(0,0,0,0.12);
-  padding: 18px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.09);
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  min-height: 430px;
+  min-height: 420px;
+  border: 1px solid rgba(0,0,0,0.06);
 }
 
 /* avatar */
-.aAvatar-wrap {
-  flex: 0 0 auto;
-}
+.aAvatar-wrap { flex: 0 0 auto; }
 .aAvatar {
-  width: 92px;
-  height: 92px;
+  width: 80px;
+  height: 80px;
   border-radius: 999px;
   background: #f2f2f2;
   border: 2px solid rgba(255,90,23,0.55);
 }
-.aAvatar-img {
-  object-fit: cover;
-}
+.aAvatar-img { object-fit: cover; }
 .aAvatar-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 900;
   color: #ff5a17;
   background: rgba(255,90,23,0.08);
@@ -278,6 +319,7 @@ onMounted(fetchArtisans)
 
 .aName {
   font-weight: 900;
+  font-size: 14px;
   color: #1f2a44;
 }
 .verify {
@@ -288,66 +330,66 @@ onMounted(fetchArtisans)
   color: #1a73e8;
   display: grid;
   place-items: center;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 900;
 }
-
 .aSpec {
   margin-top: 2px;
-  font-size: 12px;
+  font-size: 11px;
   color: rgba(31,42,68,0.55);
   font-weight: 800;
 }
 .aLoc {
-  margin-top: 6px;
-  font-size: 13px;
+  margin-top: 5px;
+  font-size: 12px;
   color: rgba(31,42,68,0.75);
   font-weight: 800;
 }
-.pin { font-size: 12px; opacity: .7; }
-
+.pin { font-size: 11px; opacity: .7; }
 .aRate {
-  margin-top: 6px;
-  font-size: 13px;
+  margin-top: 5px;
+  font-size: 12px;
   font-weight: 900;
 }
 .star { color: #ff5a17; }
 .rateTxt { color: rgba(31,42,68,0.85); }
-.rateSmall { color: rgba(31,42,68,0.55); font-weight: 800; }
+.rateSmall { color: rgba(31,42,68,0.55); font-weight: 800; font-size: 11px; }
 
 /* body */
 .aBody {
-  margin-top: 14px;
+  margin-top: 12px;
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 .aAbout {
   font-weight: 900;
+  font-size: 13px;
   color: rgba(31,42,68,0.9);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 .aDesc {
   color: rgba(31,42,68,0.62);
   font-weight: 700;
   font-size: 12px;
   line-height: 1.6;
-  height: 130px;
+  height: 115px;
   overflow: hidden;
+  margin: 0;
 }
 
 .aLast { margin-top: 10px; font-size: 12px; }
 .aLastTitle { color: rgba(31,42,68,0.85); font-weight: 900; }
-.aLastTime  { margin-top: 4px; color: rgba(31,42,68,0.55); font-weight: 800; }
-.aLastGood  { margin-top: 4px; color: #0a8f2a; font-weight: 900; }
+.aLastTime  { margin-top: 3px; color: rgba(31,42,68,0.55); font-weight: 800; }
+.aLastGood  { margin-top: 3px; color: #0a8f2a; font-weight: 900; }
 
 /* buttons */
 .aBtns { margin-top: 14px; }
 .btnP {
-  height: 38px;
+  height: 36px;
   border-radius: 999px;
   font-weight: 900;
-  font-size: 13px;
+  font-size: 12px;
   border: 1px solid rgba(0,0,0,0.10);
   background: #fff;
   cursor: pointer;
@@ -370,41 +412,37 @@ onMounted(fetchArtisans)
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: 999px;
   border: 1px solid rgba(0,0,0,0.10);
   background: rgba(255,255,255,0.95);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
   cursor: pointer;
-  font-size: 28px;
+  font-size: 26px;
   line-height: 0;
   place-items: center;
   color: rgba(0,0,0,0.55);
   z-index: 2;
 }
-.navA.left  { left: -10px; }
-.navA.right { right: -10px; }
-.navA:hover {
-  color: #ff5a17;
-  border-color: rgba(255,90,23,0.35);
-}
+.navA.left  { left: -100px; }
+.navA.right { right: -100px; }
+.navA:hover { color: #ff5a17; border-color: rgba(255,90,23,0.35); }
 
-/* dots */
+/* dots — one per page of 3 */
 .dot {
   width: 8px;
   height: 8px;
   border-radius: 999px;
   background: rgba(0,0,0,0.18);
-  transition: background 0.2s, width 0.2s, height 0.2s;
+  transition: background 0.2s, width 0.2s;
 }
 .dot.active {
   background: #ff5a17;
-  width: 10px;
-  height: 10px;
+  width: 22px;
 }
 
-/* skeleton shimmer */
+/* skeleton */
 .skel {
   background: linear-gradient(90deg, #f2f2f2 25%, #e8e8e8 50%, #f2f2f2 75%);
   background-size: 200% 100%;

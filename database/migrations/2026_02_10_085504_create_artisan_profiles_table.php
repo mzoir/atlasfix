@@ -38,6 +38,7 @@ return new class extends Migration
             $table->timestamp('phone_verified_at')->nullable();
             $table->string('phone_verification_code', 10)->nullable();
             $table->timestamp('phone_verification_expires_at')->nullable();
+   
 
             $table->timestamps();
 

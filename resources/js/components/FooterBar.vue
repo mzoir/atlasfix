@@ -5,9 +5,11 @@
 
         <!-- Left brand -->
         <div class="col-12 col-lg-4">
-          <div class="brand-title">
-            Atlas <span class="brand-fix">Fix</span>
-          </div>
+       
+        <!-- LEFT : LOGO -->
+        <RouterLink class="logo d-inline-flex align-items-center" to="/">
+          <img class="logo-img" src="../assets/Exclude1.svg" alt="AtlasFix" />
+        </RouterLink>
 
           <p class="brand-text mb-0">
             Une plateforme complète pour trouver,<br />
@@ -19,6 +21,7 @@
 
         <!-- Center -->
         <div class="col-12 col-lg-8">
+
           <!-- mini search -->
           <div class="footer-search w-100">
             <div class="footer-search-left">
@@ -26,14 +29,11 @@
               <span class="splaceholder">Quel service recherchez-vous ?</span>
               <span class="sdown">▾</span>
             </div>
-
             <div class="sdiv d-none d-md-block"></div>
-
             <div class="footer-search-mid d-none d-md-flex">
               <span class="splaceholder">localisation</span>
             </div>
-
-            <button class="footer-search-btn w-100 w-md-auto">
+            <button class="footer-search-btn w-20 w-md-auto">
               Demander votre service
             </button>
           </div>
@@ -45,26 +45,26 @@
                 <RouterLink to="/about">À propos</RouterLink>
                 <RouterLink to="/services">Services</RouterLink>
                 <RouterLink to="/contact">Contact</RouterLink>
-                <RouterLink to="/faq">FAQ’s</RouterLink>
+                <RouterLink to="/faq">FAQ's</RouterLink>
               </div>
             </div>
 
             <div class="col-12 col-md-4">
               <div class="col-links">
-                <a href="#">Politique de Confidentialité</a>
-                <a href="#">Conditions Générales d’Utilisation</a>
-                <a href="#">Page Conseils</a>
-                <a href="#">Paiements & Abonnements</a>
-                <a href="#">Résolution des litiges</a>
+                <RouterLink to="/politique-confidentialite">Politique de Confidentialité</RouterLink>
+                <RouterLink to="/conditions-generales">Conditions Générales d'Utilisation</RouterLink>
+                <RouterLink to="/conseils">Page Conseils</RouterLink>
+                <RouterLink to="/paiements-abonnements">Paiements & Abonnements</RouterLink>
+                <RouterLink to="/resolution-litiges">Résolution des litiges</RouterLink>
               </div>
             </div>
 
             <div class="col-12 col-md-4">
               <div class="col-links">
-                <a href="#">Politique de paiement</a>
-                <a href="#">Politique de confiance et sécurité</a>
-                <a href="#">Politique de remboursement</a>
-                <a href="#">Carrière</a>
+                <RouterLink to="/politique-paiement">Politique de paiement</RouterLink>
+                <RouterLink to="/politique-confiance">Politique de confiance et sécurité</RouterLink>
+                <RouterLink to="/politique-remboursement">Politique de remboursement</RouterLink>
+                <RouterLink to="/carriere">Carrière</RouterLink>
               </div>
             </div>
           </div>
@@ -87,27 +87,25 @@ import { RouterLink } from "vue-router"
 </script>
 
 <style scoped>
-/* ===== Footer background (same look) ===== */
-.footer-glass{
-   color: rgba(255,255,255,0.85);
+.footer-glass {
+  color: rgba(255,255,255,0.85);
   background-image:
-    linear-gradient(rgba(0,0,0,0.80), rgba(0,0,0,0.80)), /* ← image opacity */
+    linear-gradient(rgba(0,0,0,0.80), rgba(0,0,0,0.80)),
     url("../assets/footer.jpg");
   backdrop-filter: blur(10px);
-    background-size: cover;
-
+  background-size: cover;
   background-position: center bottom;
   background-repeat: no-repeat;
 }
 
-/* ===== Brand ===== */
-.brand-title{
+.brand-title {
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
   font-size: clamp(34px, 3.6vw, 56px);
   font-weight: 900;
   letter-spacing: -0.5px;
   color: #fff;
 }
-.brand-fix{
+.brand-fix {
   display: inline-block;
   font-size: clamp(18px, 2vw, 32px);
   font-weight: 800;
@@ -117,14 +115,13 @@ import { RouterLink } from "vue-router"
   background: rgba(255,255,255,0.92);
   color: #111;
 }
-.brand-text{
+.brand-text {
   margin-top: 14px;
   line-height: 1.7;
   color: rgba(255,255,255,0.65);
 }
 
-/* ===== Search bar ===== */
-.footer-search{
+.footer-search {
   min-height: 58px;
   border-radius: 12px;
   background: rgba(255,255,255,0.14);
@@ -132,11 +129,10 @@ import { RouterLink } from "vue-router"
   display: flex;
   align-items: center;
   padding: 8px 10px;
-  gap: 10px;
-  flex-wrap: wrap; /* ✅ mobile wrap */
+  gap: 2px;
+  flex-wrap: wrap;
 }
-
-.footer-search-left{
+.footer-search-left {
   flex: 1 1 260px;
   display: flex;
   align-items: center;
@@ -144,13 +140,12 @@ import { RouterLink } from "vue-router"
   padding-left: 10px;
   min-width: 0;
 }
-.footer-search-mid{
-  flex: 0 0 170px;
+.footer-search-mid {
+  flex: 0 0 300px;
   align-items: center;
   padding-left: 8px;
 }
-
-.splaceholder{
+.splaceholder {
   color: rgba(255,255,255,0.65);
   font-weight: 600;
   font-size: 13px;
@@ -158,12 +153,12 @@ import { RouterLink } from "vue-router"
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.sdiv{
+.sdiv {
   width: 1px;
   height: 26px;
   background: rgba(255,255,255,0.25);
 }
-.footer-search-btn{
+.footer-search-btn {
   height: 42px;
   padding: 0 18px;
   border-radius: 10px;
@@ -172,36 +167,39 @@ import { RouterLink } from "vue-router"
   color: #fff;
   font-weight: 800;
   cursor: pointer;
+  transition: background 0.2s;
+}
+.footer-search-btn:hover { background: #e84e0e; }
+
+.w-md-auto { width: auto; }
+@media (max-width: 767.98px) {
+  .w-md-auto { width: 100%; }
 }
 
-/* helper for bootstrap-like width behavior */
-.w-md-auto{ width: auto; }
-@media (max-width: 767.98px){
-  .w-md-auto{ width: 100%; } /* button full width on mobile */
-}
-
-/* ===== Links ===== */
-.col-links{
+.col-links {
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
-.col-links a{
+.col-links a {
   text-decoration: none;
   color: rgba(255,255,255,0.75);
   font-weight: 600;
+  font-size: 14px;
+  transition: color 0.18s;
 }
-.col-links a:hover{
-  color: #fff;
+.col-links a:hover,
+.col-links a.router-link-active {
+  color: #fc5a15;
 }
 
-/* ===== Divider / bottom ===== */
-.footer-line{
+.footer-line {
   border-color: rgba(255,255,255,0.25);
   opacity: 1;
 }
-.footer-bottom{
+.footer-bottom {
   color: rgba(255,255,255,0.75);
   font-weight: 600;
+  font-size: 13px;
 }
 </style>

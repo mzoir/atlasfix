@@ -4,10 +4,12 @@
     <!-- ═══════════════════════════════════════════
          HERO / BANNER
     ════════════════════════════════════════════ -->
-    <section class="hero-about atlas-section pattern-lr brick-bg">
+    <section class="hero-about atlas-section pattern-lr brick-bg"  :style="{ backgroundImage: `url(${funfact})` }">
       <div class="hero-overlay"></div>
       <div class="container hero-container text-center">
-        <span class="section-badge">À propos d'AtlasFix</span>
+          <div class="section-badge">
+        <span class="section-badged">À propos d'AtlasFix</span>
+          </div>
         <h1 class="hero-title mt-3">
           AtlasFix, votre partenaire de confiance<br class="d-none d-md-block">
           pour les services du quotidien
@@ -15,7 +17,7 @@
         <p class="hero-subtitle mx-auto mt-3">
           AtlasFix est une marketplace de services locaux qui connecte les ménages et les entreprises
           marocaines avec des artisans et prestataires de services fiables, qualifiés et de confiance.
-          Notre mission est simple : <strong>vous aider à trouver rapidement le bon professionnel,
+          Notre mission est simple : <strong  class="subtitle2">vous aider à trouver rapidement le bon professionnel,
           au bon endroit, en toute sérénité.</strong>
         </p>
       </div>
@@ -24,7 +26,7 @@
     <!-- ═══════════════════════════════════════════
          NOTRE VISION
     ════════════════════════════════════════════ -->
-    <section class="vision-section atlas-section pattern-lr py-5">
+    <section class="vision-section atlas-section pattern-lr py-5"  :style="{ backgroundImage: `url(${funfact1})` }">
       <div class="container py-4">
         <div class="text-center mb-5">
           <h2 class="section-title">Notre Vision</h2>
@@ -73,7 +75,7 @@
     <!-- ═══════════════════════════════════════════
          POURQUOI CHOISIR ATLASFIX
     ════════════════════════════════════════════ -->
-    <section class="why-section atlas-section brick-bg py-5">
+    <section class="why-section atlas-section1 brick-bg py-5" :style="{ backgroundImage: `url(${funfact3})` }">
       <div class="container py-4">
         <div class="text-center mb-5">
           <h2 class="section-title">Pourquoi choisir AtlasFix ?</h2>
@@ -96,56 +98,59 @@
       </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════
-         COMMUNAUTÉ (image + texte)
-    ════════════════════════════════════════════ -->
-    <section class="community-section py-5">
-      <div class="container py-4">
-        <div class="community-card">
-          <div class="row g-0 align-items-center">
-            <div class="col-12 col-lg-6 p-4 p-lg-5">
-              <h2 class="community-title">Une plateforme au service<br>de la communauté</h2>
-              <p class="community-text mt-3">
-                AtlasFix ne se limite pas à la mise en relation. Nous accompagnons les artisans dans
-                leur développement digital et valorisons le savoir-faire local. Chaque service réservé
-                contribue à soutenir l'économie locale et à renforcer un écosystème basé sur la
-                confiance et l'équité.
-              </p>
-              <ul class="community-list mt-4">
-                <li v-for="item in communityItems" :key="item">
-                  <span class="bullet"></span> {{ item }}
-                </li>
-              </ul>
-            </div>
-            <div class="col-12 col-lg-6">
-              <div class="community-img-wrap">
-                <img
-                  src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?w=700&q=80"
-                  alt="Artisan au travail"
-                  class="community-img"
-                />
+<!-- ═══════════════════════════════════════════
+     COMMUNAUTÉ (image + texte)
+════════════════════════════════════════════ -->
+<section class="community-section py-5">
+  <div class="container py-4">
+    <div class="community-card">
+      <div class="row g-0 align-items-center">
+        <div class="col-12 col-lg-6 p-4 p-lg-5">
+          <h2 class="community-title">Une plateforme au service<br>de la communauté</h2>
+          <p class="community-text mt-3">
+            AtlasFix ne se limite pas à la mise en relation. Nous accompagnons les artisans dans
+            leur développement digital et valorisons le savoir-faire local. Chaque service réservé
+            contribue à soutenir l'économie locale et à renforcer un écosystème basé sur la
+            confiance et l'équité.
+          </p>
+          <ul class="community-list mt-4">
+            <li v-for="item in communityItems" :key="item.text">
+              <div class="community-list-ico">
+                <span v-html="item.icon"></span>
               </div>
-            </div>
+              <span>{{ item.text }}</span>
+            </li>
+          </ul>
+        </div>
+        <div class="col-12 col-lg-6">
+          <div class="community-img-wrap">
+            <img
+              :src="artisan"
+              alt="Artisan au travail"
+              class="community-img"
+            />
           </div>
         </div>
       </div>
-    </section>
+    </div>
+  </div>
+</section>
 
     <!-- ═══════════════════════════════════════════
          TRADITION & MODERNITÉ
     ════════════════════════════════════════════ -->
-    <section class="tradition-section py-5">
+    <section class="tradition-section py-5 "  :style="{ backgroundImage: `url(${funfact3})` }">
       <div class="container py-4">
         <h2 class="trad-heading text-center mb-5">
-          AtlasFix, entre <span class="trad-accent-dark">tradition</span> et
+          AtlasFix, entre <span class="trad-accent-orange">tradition</span> et
           <span class="trad-accent-orange">modernité</span>
         </h2>
 
         <div class="row g-4 align-items-center">
           <div class="col-12 col-lg-5">
-            <div class="trad-img-wrap">
+            <div class="trad-img-wrap  ">
               <img
-                src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&q=80"
+                src="@/assets/aga.jpg"
                 alt="Artisans marocains"
                 class="trad-img"
               />
@@ -156,14 +161,14 @@
             <div class="trad-divider"></div>
             <p class="trad-text mt-3">
               AtlasFix est bien plus qu'un simple site de services. C'est un
-              <strong class="trad-accent-orange">pont entre tradition et modernité</strong>,
+              <strong class="trad-accent-orange1">pont entre tradition et modernité</strong>,
               entre le savoir-faire des artisans marocains et les attentes des familles et des
               entreprises d'aujourd'hui.
             </p>
             <p class="trad-text mt-3">
               Notre ambition est de devenir une référence des services de proximité, d'abord au
               Maroc, puis à l'international, tout en restant fidèles à nos valeurs :
-              <strong class="trad-accent-orange">
+              <strong class="trad-accent-orange1">
                 confiance, transparence et esprit communautaire.
               </strong>
             </p>
@@ -176,6 +181,15 @@
 </template>
 
 <script setup>
+
+import funfact from "@/assets/had.png"
+
+
+import artisan from "@/assets/ard.jpg"
+import funfact3 from "@/assets/iiko.jpg"
+import funfact1 from "@/assets/cp.png"
+
+
 const features = [
   {
     title: "Des prestataires sélectionnés et évalués",
@@ -208,35 +222,66 @@ const features = [
     bg: "rgba(41,182,246,0.10)",
   },
 ]
-
 const communityItems = [
-  "Soutien à l'économie locale",
-  "Valorisation du savoir-faire marocain",
-  "Formation et accompagnement digital",
-  "Écosystème équitable et transparent",
+  {
+    text: "Soutien à l'économie locale",
+    icon: `<svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" stroke="#fc5a15" stroke-width="1.5"/></svg>`,
+  },
+  {
+    text: "Valorisation du savoir-faire marocain",
+    icon: `<svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M12 2l2.09 6.26H21l-5.47 3.97 2.09 6.26L12 14.52l-5.62 3.97 2.09-6.26L3 8.26h6.91z" stroke="#fc5a15" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
+  },
+  {
+    text: "Formation et accompagnement digital",
+    icon: `<svg width="18" height="18" fill="none" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="#fc5a15" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  },
+  {
+    text: "Écosystème équitable et transparent",
+    icon: `<svg width="18" height="18" fill="none" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#fc5a15" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
+  },
 ]
 </script>
 
 <style scoped>
-/* ── Google Font ── */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
-.about-page {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-}
-
 /* ── Shared utilities ── */
-.atlas-section { position: relative; overflow: hidden; }
+.atlas-section { position: relative; overflow: hidden; 
+  background-size: contain;
+  background-position: left;
+  background-repeat: no-repeat; 
+
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.6) 80.57%, #FFFFFF 100%),}
 .atlas-section > * { position: relative; z-index: 2; }
 
+.atlas-section1 {
+  position: relative;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.atlas-section1::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.75) 17.02%, rgba(255, 255, 255, 0) 64.16%),
+    linear-gradient(269.47deg, rgba(255, 255, 255, 0) 77.68%, #FFFFFF 99.17%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.atlas-section1 > * {
+  position: relative;
+  z-index: 2;
+}
 .pattern-lr::before,
 .pattern-lr::after {
   content: "";
   position: absolute;
   width: 340px;
   height: 340px;
-  background-image: radial-gradient(circle, rgba(252,90,21,0.12) 0%, transparent 70%),
-    repeating-conic-gradient(rgba(252,90,21,0.06) 0deg, transparent 10deg, transparent 30deg);
   background-size: contain;
   background-repeat: no-repeat;
   z-index: 0;
@@ -258,7 +303,14 @@ const communityItems = [
 
 /* ── HERO ── */
 .hero-about {
-  background: linear-gradient(135deg, #fff8f5 0%, #fff 60%, #fff5f0 100%);
+  
+  background: 
+    linear-gradient(180deg, rgba(243, 240, 240, 0.9) 44.57%, #FFFFFF 100%),
+    linear-gradient(165deg, rgba(234, 235, 237, 0.98) 0%, rgba(192, 112, 37, 0.5) 100%);
+  
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   padding: 80px 0 60px;
 }
 .hero-overlay {
@@ -266,27 +318,69 @@ const communityItems = [
   background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.6) 100%);
 }
 .hero-container { position: relative; z-index: 2; }
-
 .section-badge {
-  display: inline-block;
-  background: rgba(252,90,21,0.10);
-  color: #fc5a15;
-  font-weight: 700;
-  font-size: 14px;
-  padding: 6px 20px;
-  border-radius: 50px;
-  border: 1px solid rgba(252,90,21,0.25);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 502px;
+  height: 100.4px;
+  border-radius: 20px;
+  border: 1.56px solid #fc5a15;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+  background:  transparent;
+  padding: 21.79px 12.45px;
+  gap: 7.78px;
+  opacity: 4;
 }
 
+.section-badged {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  font-size: 42.81px;
+  line-height: 28.02px;
+  letter-spacing: 0.31px;
+  text-align: center;
+  vertical-align: middle;
+  color: #fc5a15;
+  border: none;
+  padding: 0;
+  display: inline-block;
+}
+.subtitle2 {
+
+  font-family: "poppins";
+font-weight: 600;
+font-style: "SemiBold";
+font-size: 18px;
+line-height: 29.25px;
+letter-spacing: -0.44px;
+text-align: center;
+
+ } 
 .hero-title {
-  font-size: clamp(26px, 3.8vw, 48px);
-  font-weight: 800;
-  color: #0b0b0b;
+  font-family: "poppins";
+font-weight: 400;
+font-style: normal;
+font-size: 35px;
+line-height: 53px;
+letter-spacing: 0.4px;
+text-align: center;
+vertical-align: middle;
+
+  color:#314158;
   line-height: 1.15;
   letter-spacing: -0.4px;
 }
 
 .hero-subtitle {
+  font-family: "poppins";
+font-weight: 400;
+font-style: normal;
+font-size: 18px;
+line-height: 29.25px;
+letter-spacing: -0.44px;
+text-align: center;
+
   font-size: 15px;
   line-height: 1.75;
   color: rgba(0,0,0,0.55);
@@ -295,8 +389,9 @@ const communityItems = [
 
 /* ── SECTION COMMON ── */
 .section-title {
+   font-family: "inter", sans-serif;
   font-size: clamp(22px, 3vw, 34px);
-  font-weight: 800;
+  font-weight: 400;
   color: #0b0b0b;
   letter-spacing: -0.3px;
 }
@@ -356,7 +451,6 @@ const communityItems = [
 }
 
 /* ── WHY / FEATURES ── */
-.why-section { background: #fafafa; }
 
 .feat-card {
   background: #fff;
@@ -392,39 +486,64 @@ const communityItems = [
 }
 
 /* ── COMMUNITY ── */
-.community-section { background: #fff; }
+.community-section { background: #fff;  height: 100%; min-height: 600px; }
 
 .community-card {
+ 
   border-radius: 24px;
   overflow: hidden;
-  background: linear-gradient(135deg, #0b0b0b 0%, #1a1a1a 100%);
+   background: #fff; 
   box-shadow: 0 20px 60px rgba(0,0,0,0.15);
 }
-
 .community-title {
-  font-size: clamp(20px, 2.8vw, 30px);
-  font-weight: 800;
-  color: #fff;
+  font-family: "poppins";
+font-weight: 500;
+font-style: Medium;
+font-size: 40px;
+line-height: 53px;
+letter-spacing: 0px;
+color:rgba(49, 65, 88, 1);
   line-height: 1.2;
 }
 .community-text {
-  font-size: 14px;
-  color: rgba(255,255,255,0.6);
+  font-family: "poppins";
+font-weight: 400;
+font-style:normal ;
+font-size: 18px;
+line-height: 29.25px;
+letter-spacing: -0.44px;
+
+  color: rgba(98, 116, 142, 1);
   line-height: 1.75;
 }
-
+.community-list-ico {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  background: rgba(252, 90, 21, 0.08);
+    border: 1px solid rgba(252,90,21,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .community-list {
   list-style: none;
   padding: 0; margin: 0;
   display: flex; flex-direction: column; gap: 10px;
 }
 .community-list li {
+  font-family: "poppins";
+font-weight: 400;
+font-style: normal;
+font-size: 16px;
+line-height: 24px;
+letter-spacing: -0.31px;
+
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.85);
+  color: rgba(49, 65, 88, 1);
 }
 .bullet {
   width: 8px; height: 8px;
@@ -432,11 +551,11 @@ const communityItems = [
   background: #fc5a15;
   flex-shrink: 0;
 }
-
 .community-img-wrap {
   height: 100%;
-  min-height: 320px;
+  min-height: 280px;
   overflow: hidden;
+  border-radius: 0 24px 24px 0;
 }
 .community-img {
   width: 100%;
@@ -445,18 +564,78 @@ const communityItems = [
   display: block;
   filter: brightness(0.85);
 }
+.community-section { 
+  padding: 30px 0 !important;
+}
+
+.community-card .col-12.col-lg-6.p-4 {
+  padding: 28px !important;
+}
+
+
 
 /* ── TRADITION ── */
-.tradition-section { background: #fff; }
+.tradition-section {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow: hidden;
+}
+
+.tradition-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85) 17.02%, rgba(255, 255, 255, 0) 64.16%),
+    linear-gradient(269.47deg, rgba(255, 255, 255, 0.5) 77.68%, rgba(255, 255, 255, 0.9) 99%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.tradition-section > * {
+  position: relative;
+  z-index: 2;
+}
 
 .trad-heading {
-  font-size: clamp(22px, 3vw, 38px);
-  font-weight: 800;
-  color: #0b0b0b;
-  letter-spacing: -0.3px;
+font-family: "Poppins";
+font-weight: 550;
+font-style: Medium;
+font-size: 40px;
+line-height: 60px;
+letter-spacing: -0.44px;
+text-align: center;
+vertical-align: middle;
+color : rgba(0, 0, 0, 1)
+
 }
-.trad-accent-dark   { color: #0b0b0b; }
-.trad-accent-orange { color: #fc5a15; }
+.trad-accent-dark   {  font-family: "Poppins";
+font-weight: 400;
+font-style: edium;
+font-size: 40px;;
+ color: rgba(252, 90, 21, 1);
+text-align: center;
+vertical-align: middle;
+ }
+.trad-accent-orange { color: rgba(252, 90, 21, 1);font-family: "Poppins";
+font-weight: 400;
+font-style: "Regular";
+font-size: 40px;
+line-height: 28px;
+letter-spacing: -0.45px;
+ }
+ 
+.trad-accent-orange1 {
+ font-family: "Poppins";
+ color: rgba(252, 90, 21, 1);
+font-weight: 400;
+font-style: "Regular";
+font-size: 20px;
+line-height: 28px;
+letter-spacing: -0.45px;
+ }
 
 .trad-img-wrap {
   border-radius: 20px;
@@ -472,8 +651,15 @@ const communityItems = [
 }
 
 .trad-subtitle {
-  font-size: clamp(18px, 2.2vw, 24px);
-  font-weight: 700;
+   font-family: "Poppinsr", sans-serif;
+  
+font-weight: 400;
+font-style: Regular;
+font-size: 30px;
+line-height: 60px;
+letter-spacing: -0.44px;
+vertical-align: middle;
+
   color: #0b0b0b;
 }
 .trad-divider {
@@ -483,14 +669,68 @@ const communityItems = [
   margin-top: 10px;
 }
 .trad-text {
-  font-size: 15px;
-  line-height: 1.75;
-  color: rgba(0,0,0,0.6);
+  font-family: "Poppins";
+font-weight: 400;
+font-style: "Regular";
+font-size: 20px;
+line-height: 28px;
+letter-spacing: -0.45px;
+
+  color:rgba(98, 116, 142, 1);
 }
 
 /* ── Responsive tweaks ── */
 @media (max-width: 767px) {
   .hero-about { padding: 60px 0 40px; }
   .community-img-wrap { min-height: 220px; }
+}
+.vision-section {
+  background-size: contain;
+  background-position: left;
+  background-repeat: no-repeat;
+  position: relative;
+}
+
+.vision-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.99) 0%,
+    rgba(255, 255, 255, 0.75) 50%,
+    rgba(255, 255, 255, 0.92) 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
+.vision-section > * {
+  position: relative;
+  z-index: 2;
+}
+.why-section {
+   height: 662.25;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow: hidden;
+}
+
+.why-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.75) 17.02%, rgba(255, 255, 255, 0) 64.16%),
+    linear-gradient(269.47deg, rgba(255, 255, 255, 0.8) 77.68%, #FFFFFF 99.17%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.why-section > * {
+  position: relative;
+  z-index: 2;
 }
 </style>

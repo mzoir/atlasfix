@@ -11,7 +11,9 @@ class ArtisanMedia extends Model
         'path',
         'type',
     ];
+// App\Models\ArtisanMedia.php
 
+protected $table = 'artisan_media'; // match exactly what your migration created
     public function artisanProfile()
     {
         return $this->belongsTo(ArtisanProfile::class);

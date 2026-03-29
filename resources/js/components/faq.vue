@@ -87,7 +87,7 @@
           <!-- Sidebar -->
           <div class="col-12 col-lg-5">
             <!-- Help card -->
-            <div class="help-card mb-4">
+            <div class="help-card mb-4 ">
               <div class="help-card-icon">
                 <svg width="28" height="28" fill="none" viewBox="0 0 24 24">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/>
@@ -234,12 +234,6 @@ const contacts = [
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
-.faq-page {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-}
-
 /* ── shared ── */
 .atlas-section { position: relative; overflow: hidden; }
 .atlas-section > * { position: relative; z-index: 2; }
@@ -249,15 +243,12 @@ const contacts = [
   content: "";
   position: absolute;
   width: 340px; height: 340px;
-  background-image: radial-gradient(circle, rgba(252,90,21,0.10) 0%, transparent 70%),
-    repeating-conic-gradient(rgba(252,90,21,0.05) 0deg, transparent 10deg, transparent 30deg);
   background-size: contain;
   background-repeat: no-repeat;
   z-index: 0;
   pointer-events: none;
 }
 .pattern-lr::before { left: -80px; top: 30px; }
-.pattern-lr::after  { right: -80px; bottom: 30px; }
 
 /* ── HERO ── */
 .faq-hero {
@@ -266,34 +257,44 @@ const contacts = [
 }
 .hero-bg-grad {
   position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse 60% 50% at 50% -10%, rgba(252,90,21,0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 40% 40% at 80% 100%, rgba(99,102,241,0.06) 0%, transparent 70%);
 }
 .hero-container { position: relative; z-index: 2; }
 
 .section-badge {
   display: inline-flex;
   align-items: center;
-  background: rgba(252,90,21,0.08);
-  color: #fc5a15;
-  font-weight: 700;
-  font-size: 13px;
+  font-family: "Poppins";
+font-weight: 400;
+font-style: "Regular";
+font-size: 16px;
+line-height: 24px;
+letter-spacing: -0.31px;
+text-align: center;
+
+  color: rgba(49, 65, 88, 1);
   padding: 6px 18px;
   border-radius: 50px;
   border: 1px solid rgba(252,90,21,0.2);
 }
 
 .faq-hero-title {
-  font-size: clamp(32px, 5vw, 58px);
-  font-weight: 800;
-  color: #0b0b0b;
+  font-family: "Poppins";
+font-weight: 400;
+font-style: Regular;
+font-size: 60px;
+line-height: 71px;
+letter-spacing: 0.26px;
+text-align: center;
+color:rgba(49, 65, 88, 1);
   line-height: 1.1;
   letter-spacing: -0.5px;
 }
 .faq-hero-sub {
-  font-size: 15px;
-  color: rgba(0,0,0,0.45);
+  
+  font-family: "Poppins";
+font-weight: 400;
+  font-size: 20px;
+  color: rgba(98, 116, 142, 1);
   font-weight: 500;
 }
 
@@ -325,14 +326,17 @@ const contacts = [
 .faq-search-input::placeholder { color: rgba(0,0,0,0.35); }
 
 /* ── CONTENT SECTION ── */
-.faq-content-section { background: #fff; }
+.faq-content-section { background: #fff;  }
 
 /* Tabs */
-.faq-tabs { border-bottom: none; }
+.faq-tabs { border-bottom: none; 
+  justify-content: center;
+align-items: center; }
 
 .faq-tab-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
   border: 1.5px solid rgba(0,0,0,0.10);
   background: #fff;
@@ -371,6 +375,13 @@ const contacts = [
 }
 
 .faq-question {
+  font-family: "Poppins";
+font-weight: 400;
+font-style: "Regular";
+font-size: 18px;
+line-height: 28px;
+letter-spacing: -0.44px;
+color:rgba(49, 65, 88, 1);
   width: 100%;
   display: flex;
   align-items: center;
@@ -380,9 +391,6 @@ const contacts = [
   background: transparent;
   border: none;
   font-family: inherit;
-  font-size: 14.5px;
-  font-weight: 600;
-  color: #0b0b0b;
   text-align: left;
   cursor: pointer;
 }
@@ -427,17 +435,20 @@ const contacts = [
 
 /* ── HELP CARD ── */
 .help-card {
+
   background: linear-gradient(135deg, #fc5a15 0%, #ff7a3d 100%);
   border-radius: 18px;
   padding: 28px 24px;
-  text-align: center;
+  justify-content: left;
+  text-align: left;
   box-shadow: 0 16px 40px rgba(252,90,21,0.30);
 }
 .help-card-icon {
   width: 52px; height: 52px;
   border-radius: 14px;
   background: rgba(255,255,255,0.20);
-  display: flex; align-items: center; justify-content: center;
+  display: flex; 
+  align-items: center; justify-content: center;
   margin: 0 auto;
 }
 .help-card-title {

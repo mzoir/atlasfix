@@ -122,15 +122,23 @@ import icon3 from "@/assets/Container1.png"
 }
 
 .need-title {
-  font-weight: 900;
-  font-size: 22px;
-  color: #111;
+  font-family: Poppins;
+font-weight: 600;
+font-style: Medium;
+font-size: 22.61px;
+line-height: 22.61px;
+letter-spacing: -0.29px;
+  color : #030302;
 }
 
 .need-desc {
-  color: rgba(0, 0, 0, 0.55);
-  font-weight: 700;
-  font-size: 13px;
+  font-family: Poppins;
+font-weight: 400;
+font-style: Regular;
+font-size: 15.08px;
+line-height: 22.61px;
+letter-spacing: -0.29px;
+  color: #4A5565;
   line-height: 1.7;
 }
 

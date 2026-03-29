@@ -15,9 +15,10 @@ use Illuminate\Support\Str;
 
 class ArtisanController extends Controller
 {
-    /**
-     * Helper: get user by temp_id (register_token) with expiry check
-     */
+    // ==========================================
+    // 🔧 HELPERS
+    // ==========================================
+
     private function userByTempId(string $tempId): ?User
     {
         return User::where('register_token', $tempId)
@@ -26,197 +27,251 @@ class ArtisanController extends Controller
             ->first();
     }
 
+    private function formatArtisan(User $u): array
+    {
+        $profile = $u->artisanProfile;
+
+        $portfolioImages = collect($profile?->portfolio_images ?? [])
+            ->map(fn($path) => asset('storage/' . $path))
+            ->values()
+            ->toArray();
+
+        return [
+            'id'               => $u->id,
+            'name'             => $u->name,
+            'email'            => $u->email,
+            'phone'            => $u->phone,
+            'ville'            => $profile?->ville,
+            'adresse'          => $profile?->adresse,
+            'diplome'          => $profile?->diplome,
+            'description'      => $profile?->description,
+            'speciality'       => $u->artisanServices->first()?->name,
+            'profile_photo'    => $portfolioImages[0] ?? null,
+            'portfolio_images' => $portfolioImages,
+            'services'         => $u->artisanServices->pluck('name'),
+            'is_verified'      => (bool) $u->email_verified_at && (bool) $u->phone_verified_at,
+            'rating'           => null,
+            'reviews_count'    => 0,
+        ];
+    }
+
+    // ==========================================
+    // 📋 REGISTRATION STEPS
+    // ==========================================
+
     /**
-     * STEP 1 ✅ Start registration (NO password, NO token)
+     * STEP 1 — Start registration
      * POST /api/register/artisan/start
      */
     public function start(Request $request)
     {
         $data = $request->validate([
-            'nom_complet'    => 'required|string|max:255',
-            'email'          => 'required|email|max:255|unique:users,email',
-            'phone'          => 'required|string|max:30|unique:users,phone',
+            'nom_complet'   => 'required|string|max:255',
+            'email'         => 'required|email|max:255|unique:users,email',
+            'phone'         => 'required|string|max:30|unique:users,phone',
             'date_of_birth' => 'nullable|date',
         ]);
 
         $tempId = Str::random(60);
 
         $artisan = User::create([
-            'name' => $data['nom_complet'],
-            'email' => $data['email'],
-            'phone' => $data['phone'],
-            'role' => 'artisan',
-            'password' => null,
-            'abonnement' => 'free',
-            'register_token' => $tempId,
+            'name'                      => $data['nom_complet'],
+            'email'                     => $data['email'],
+            'phone'                     => $data['phone'],
+            'role'                      => 'artisan',
+            'password'                  => null,
+            'abonnement'                => 'free',
+            'register_token'            => $tempId,
             'register_token_expires_at' => now()->addMinutes(20),
-            'email_verified_at' => null,
-            'phone_verified_at' => null,
+            'email_verified_at'         => null,
+            'phone_verified_at'         => null,
         ]);
 
         ArtisanProfile::create([
-            'user_id' => $artisan->id,
-            'nom_complet' => $data['nom_complet'],
+            'user_id'        => $artisan->id,
+            'nom_complet'    => $data['nom_complet'],
             'date_naissance' => $data['date_of_birth'] ?? null,
         ]);
 
         $emailCode = (string) random_int(1000, 9999);
-        $artisan->email_verification_code = $emailCode;
-        $artisan->email_verification_expires_at = now()->addMinutes(10);
-
         $phoneCode = (string) random_int(1000, 9999);
-        $artisan->phone_verification_code = $phoneCode;
-        $artisan->phone_verification_expires_at = now()->addMinutes(10);
 
-        $artisan->save();
+        $artisan->update([
+            'email_verification_code'       => $emailCode,
+            'email_verification_expires_at' => now()->addMinutes(10),
+            'phone_verification_code'       => $phoneCode,
+            'phone_verification_expires_at' => now()->addMinutes(10),
+        ]);
 
         Mail::to($artisan->email)->send(new EmailOtpMail($emailCode));
 
         $this->sendSms(new Request([
-            'to' => $artisan->phone,
+            'to'      => $artisan->phone,
             'message' => "Votre code de vérification est : {$phoneCode}",
         ]));
 
         return response()->json([
-            'message' => 'OTP sent to email and phone',
-            'temp_id' => $tempId,
+            'message'        => 'OTP sent to email and phone',
+            'temp_id'        => $tempId,
             'email_verified' => false,
             'phone_verified' => false,
         ], 201);
     }
 
     /**
-     * STEP 2 ✅ Verify Email
+     * STEP 2 — Verify email OTP
      * POST /api/register/artisan/verify-email
      */
     public function verifyEmail(Request $request)
     {
         $request->validate([
             'temp_id' => 'required|string',
-            'code' => 'required|string',
+            'code'    => 'required|string',
         ]);
 
         $u = $this->userByTempId($request->temp_id);
-        if (!$u) return response()->json(['message' => 'Invalid or expired temp_id'], 422);
+        if (!$u) {
+            return response()->json(['message' => 'Invalid or expired temp_id'], 422);
+        }
 
         if ($u->email_verified_at) {
             return response()->json(['message' => 'Email already verified', 'email_verified' => true], 200);
         }
 
-        if (
-            $u->email_verification_code === $request->code &&
-            $u->email_verification_expires_at &&
-            now()->lessThanOrEqualTo($u->email_verification_expires_at)
-        ) {
-            $u->email_verified_at = now();
-            $u->email_verification_code = null;
-            $u->email_verification_expires_at = null;
-            $u->save();
+        $valid = $u->email_verification_code === $request->code
+            && $u->email_verification_expires_at
+            && now()->lessThanOrEqualTo($u->email_verification_expires_at);
 
-            return response()->json(['message' => 'Email verified successfully', 'email_verified' => true], 200);
+        if (!$valid) {
+            return response()->json(['message' => 'Invalid or expired code', 'email_verified' => false], 422);
         }
 
-        return response()->json(['message' => 'Invalid or expired code', 'email_verified' => false], 422);
+        $u->update([
+            'email_verified_at'             => now(),
+            'email_verification_code'       => null,
+            'email_verification_expires_at' => null,
+        ]);
+
+        return response()->json(['message' => 'Email verified successfully', 'email_verified' => true], 200);
     }
 
     /**
-     * STEP 3 ✅ Verify Phone
+     * STEP 3 — Verify phone OTP
      * POST /api/register/artisan/verify-phone
      */
     public function verifyPhone(Request $request)
     {
         $request->validate([
             'temp_id' => 'required|string',
-            'code' => 'required|string',
+            'code'    => 'required|string',
         ]);
 
         $u = $this->userByTempId($request->temp_id);
-        if (!$u) return response()->json(['message' => 'Invalid or expired temp_id'], 422);
+        if (!$u) {
+            return response()->json(['message' => 'Invalid or expired temp_id'], 422);
+        }
 
         if ($u->phone_verified_at) {
             return response()->json(['message' => 'Phone already verified', 'phone_verified' => true], 200);
         }
 
-        if (
-            $u->phone_verification_code === $request->code &&
-            $u->phone_verification_expires_at &&
-            now()->lessThanOrEqualTo($u->phone_verification_expires_at)
-        ) {
-            $u->phone_verified_at = now();
-            $u->phone_verification_code = null;
-            $u->phone_verification_expires_at = null;
-            $u->save();
+        $valid = $u->phone_verification_code === $request->code
+            && $u->phone_verification_expires_at
+            && now()->lessThanOrEqualTo($u->phone_verification_expires_at);
 
-            return response()->json(['message' => 'Phone verified successfully', 'phone_verified' => true], 200);
+        if (!$valid) {
+            return response()->json(['message' => 'Invalid or expired code', 'phone_verified' => false], 422);
         }
 
-        return response()->json(['message' => 'Invalid or expired code', 'phone_verified' => false], 422);
+        $u->update([
+            'phone_verified_at'             => now(),
+            'phone_verification_code'       => null,
+            'phone_verification_expires_at' => null,
+        ]);
+
+        return response()->json(['message' => 'Phone verified successfully', 'phone_verified' => true], 200);
     }
 
     /**
-     * STEP 4 ✅ Complete profile
+     * STEP 4 — Complete artisan profile
      * POST /api/register/artisan/complete-profile
      */
     public function completeProfile(Request $request)
     {
         $request->validate([
-            'temp_id' => 'required|string',
-            'ville' => 'nullable|string|max:255',
-            'adresse' => 'nullable|string|max:255',
-            'diplome' => 'nullable|string|max:255',
-            'description' => 'nullable|string|max:255',
-            'diplome_file' => 'nullable|file|max:5120',
-            'images.*' => 'nullable|image|max:4096',
-            'new_service_name' => 'nullable|string|max:255',
+            'temp_id'              => 'required|string',
+            'ville'                => 'nullable|string|max:255',
+            'adresse'              => 'nullable|string|max:255',
+            'diplome'              => 'nullable|string|max:255',
+            'description'          => 'nullable|string|max:255',
+            'diplome_file'         => 'nullable|file|max:5120',
+            'images.*'             => 'nullable|image|max:4096',
+            'new_service_name'     => 'nullable|string|max:255',
             'service_principal_id' => 'nullable|integer',
-            'service_ids' => 'nullable',
+            'service_ids'          => 'nullable',
         ]);
 
         $u = $this->userByTempId($request->temp_id);
-        if (!$u) return response()->json(['message' => 'Invalid or expired temp_id'], 422);
+        if (!$u) {
+            return response()->json(['message' => 'Invalid or expired temp_id'], 422);
+        }
 
         $profile = $u->artisanProfile;
-        if (!$profile) return response()->json(['message' => 'Profile not found'], 404);
+        if (!$profile) {
+            return response()->json(['message' => 'Profile not found'], 404);
+        }
 
-        $profile->ville = $request->ville;
-        $profile->adresse = $request->adresse;
-        $profile->diplome = $request->diplome;
-        $profile->description = $request->description;
+        // ── Basic fields ──────────────────────────────────────────────────
+        $profileData = [
+            'ville'       => $request->ville,
+            'adresse'     => $request->adresse,
+            'diplome'     => $request->diplome,
+            'description' => $request->description,
+        ];
 
         if ($request->hasFile('diplome_file')) {
-            $profile->diplome_file_path = $request->file('diplome_file')->store('artisans/diplomes', 'public');
+            $profileData['diplome_file_path'] = $request->file('diplome_file')
+                ->store('artisans/diplomes', 'public');
         }
-        $profile->save();
+
+        // ── Portfolio images → stored as JSON array in artisan_profiles ───
+        $existingImages = $profile->portfolio_images ?? [];
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $img) {
-                $p = $img->store('artisans/portfolio', 'public');
-                $profile->medias()->create(['path' => $p, 'type' => 'image']);
+                if (!$img->isValid()) {
+                    continue;
+                }
+                $existingImages[] = $img->store('artisans/portfolio', 'public');
             }
         }
 
-        $newServiceId = null;
+        $profileData['portfolio_images'] = $existingImages;
+
+        $profile->update($profileData);
+
+        // ── Services ──────────────────────────────────────────────────────
+        $serviceIds = [];
+
+        if ($request->filled('service_ids')) {
+            $raw     = $request->input('service_ids');
+            $decoded = is_string($raw) ? json_decode($raw, true) : $raw;
+            if (is_array($decoded)) {
+                $serviceIds = $decoded;
+            }
+        }
+
         if (!empty($request->new_service_name)) {
-            $service = Service::firstOrCreate(
-                ['name' => trim($request->new_service_name)],
+            $service      = Service::firstOrCreate(
+                ['name'       => trim($request->new_service_name)],
                 ['is_default' => false]
             );
-            $newServiceId = $service->id;
+            $serviceIds[] = $service->id;
         }
 
-        $serviceIds = [];
-        if ($request->filled('service_ids')) {
-            $raw = $request->input('service_ids');
-            if (is_string($raw)) {
-                $decoded = json_decode($raw, true);
-                if (is_array($decoded)) $serviceIds = $decoded;
-            } elseif (is_array($raw)) {
-                $serviceIds = $raw;
-            }
+        if (!empty($request->service_principal_id)) {
+            $serviceIds[] = (int) $request->service_principal_id;
         }
-
-        if ($newServiceId) $serviceIds[] = $newServiceId;
-        if (!empty($request->service_principal_id)) $serviceIds[] = (int) $request->service_principal_id;
 
         $serviceIds = array_values(array_unique(array_map('intval', $serviceIds)));
 
@@ -224,171 +279,167 @@ class ArtisanController extends Controller
             $u->artisanServices()->sync($serviceIds);
         }
 
-        return response()->json(['message' => 'Profile completed'], 200);
+        return response()->json([
+            'message'          => 'Profile completed',
+            'images_saved'     => count($existingImages),
+            'portfolio_images' => collect($existingImages)
+                                    ->map(fn($p) => asset('storage/' . $p))
+                                    ->values(),
+        ], 200);
     }
 
     /**
-     * STEP 5 ✅ Set password => create sanctum token
+     * STEP 5 — Set password and activate account
      * POST /api/register/artisan/set-password
      */
     public function setPassword(Request $request)
     {
         $request->validate([
-            'temp_id' => 'required|string',
+            'temp_id'  => 'required|string',
             'password' => 'required|string|min:6|confirmed',
         ]);
 
         $u = $this->userByTempId($request->temp_id);
-        if (!$u) return response()->json(['message' => 'Invalid or expired temp_id'], 422);
+        if (!$u) {
+            return response()->json(['message' => 'Invalid or expired temp_id'], 422);
+        }
 
-        $u->password = Hash::make($request->password);
-        $u->register_token = null;
-        $u->register_token_expires_at = null;
-        $u->save();
+        $u->update([
+            'password'                  => Hash::make($request->password),
+            'register_token'            => null,
+            'register_token_expires_at' => null,
+        ]);
 
         $token = $u->createToken('multi-app')->plainTextToken;
 
         return response()->json([
             'message' => 'Account activated',
-            'token' => $token,
-            'artisan' => $u->load('artisanProfile.medias', 'artisanServices'),
+            'token'   => $token,
+            'artisan' => $u->load('artisanProfile', 'artisanServices'),
         ], 200);
     }
 
+    // ==========================================
+    // 🔁 OTP RESEND
+    // ==========================================
+
     /**
-     * RESEND EMAIL OTP
      * POST /api/register/artisan/resend-email
      */
     public function resendEmail(Request $request)
     {
-        $request->validate([
-            'temp_id' => 'required|string',
-        ]);
+        $request->validate(['temp_id' => 'required|string']);
 
         $u = $this->userByTempId($request->temp_id);
-        if (!$u) return response()->json(['message' => 'Invalid or expired temp_id'], 422);
+        if (!$u) {
+            return response()->json(['message' => 'Invalid or expired temp_id'], 422);
+        }
 
         if ($u->email_verified_at) {
             return response()->json(['message' => 'Email already verified', 'email_verified' => true], 200);
         }
 
         $emailCode = (string) random_int(1000, 9999);
-        $u->email_verification_code = $emailCode;
-        $u->email_verification_expires_at = now()->addMinutes(10);
-        $u->save();
+
+        $u->update([
+            'email_verification_code'       => $emailCode,
+            'email_verification_expires_at' => now()->addMinutes(10),
+        ]);
 
         Mail::to($u->email)->send(new EmailOtpMail($emailCode));
 
-        return response()->json([
-            'message' => 'Email OTP resent',
-            'email_verified' => false,
-        ], 200);
+        return response()->json(['message' => 'Email OTP resent', 'email_verified' => false], 200);
     }
 
     /**
-     * RESEND PHONE OTP
      * POST /api/register/artisan/resend-phone
      */
     public function resendPhone(Request $request)
     {
-        $request->validate([
-            'temp_id' => 'required|string',
-        ]);
+        $request->validate(['temp_id' => 'required|string']);
 
         $u = $this->userByTempId($request->temp_id);
-        if (!$u) return response()->json(['message' => 'Invalid or expired temp_id'], 422);
+        if (!$u) {
+            return response()->json(['message' => 'Invalid or expired temp_id'], 422);
+        }
 
         if ($u->phone_verified_at) {
             return response()->json(['message' => 'Phone already verified', 'phone_verified' => true], 200);
         }
 
         $phoneCode = (string) random_int(1000, 9999);
-        $u->phone_verification_code = $phoneCode;
-        $u->phone_verification_expires_at = now()->addMinutes(10);
-        $u->save();
+
+        $u->update([
+            'phone_verification_code'       => $phoneCode,
+            'phone_verification_expires_at' => now()->addMinutes(10),
+        ]);
 
         $this->sendSms(new Request([
-            'to' => $u->phone,
+            'to'      => $u->phone,
             'message' => "Votre code de vérification est : {$phoneCode}",
         ]));
 
-        return response()->json([
-            'message' => 'Phone OTP resent',
-            'phone_verified' => false,
-        ], 200);
+        return response()->json(['message' => 'Phone OTP resent', 'phone_verified' => false], 200);
     }
 
-    /**
-     * Manual SMS Send (Infobip)
-     */
+    // ==========================================
+    // 📡 SMS
+    // ==========================================
+
     public function sendSms(Request $request)
     {
-        $phone = $request->input('to');
-        $message = $request->input('message');
-
         $response = Http::withHeaders([
             'Authorization' => 'App fa9af75bf804e30f693dbb1f386272e6-f0c85b88-4e22-4043-aaf2-aec0a522f1eb',
             'Content-Type'  => 'application/json',
             'Accept'        => 'application/json',
         ])->post('https://m9mwg9.api.infobip.com/sms/2/text/advanced', [
             'messages' => [[
-                'from' => 'ServiceSM',
-                'destinations' => [['to' => $phone]],
-                'text' => $message,
-            ]]
+                'from'         => 'ServiceSM',
+                'destinations' => [['to' => $request->input('to')]],
+                'text'         => $request->input('message'),
+            ]],
         ]);
 
         return $response->json();
     }
 
+    // ==========================================
+    // 👷 ARTISAN LISTING
+    // ==========================================
+
     /**
-     * Fetch all artisans
+     * GET /api/artisans
      */
     public function index()
     {
         $artisans = User::where('role', 'artisan')
             ->whereNotNull('password')
-            ->with([
-                'artisanProfile.medias',
-                'artisanServices',
-            ])
+            ->with(['artisanProfile', 'artisanServices'])
             ->get()
-            ->map(function (User $u) {
-                $profile = $u->artisanProfile;
-
-                $photo = $profile?->medias->first()?->path
-                    ? asset('storage/' . $profile->medias->first()->path)
-                    : null;
-
-                return [
-                    'id'             => $u->id,
-                    'name'           => $u->name,
-                    'email'          => $u->email,
-                    'phone'          => $u->phone,
-                    'ville'          => $profile?->ville,
-                    'description'    => $profile?->description,
-                    'speciality'     => $u->artisanServices->first()?->name,
-                    'profile_photo'  => $photo,
-                    'portfolio_images' => $profile?->medias
-    ->map(fn($m) => 'storage/' . $m->path)
-    ->values()
-    ->toArray() ?? [],
-                    'rating'         => null,
-                    'reviews_count'  => 0,
-                    'is_verified'    => (bool) $u->email_verified_at && (bool) $u->phone_verified_at,
-                    'services'       => $u->artisanServices->pluck('name'),
-                ];
-            });
+            ->map(fn(User $u) => $this->formatArtisan($u));
 
         return response()->json(['data' => $artisans], 200);
     }
 
+    /**
+     * GET /api/artisan/me
+     */
+    public function me(Request $request)
+    {
+        $user = $request->user()->load('artisanProfile', 'artisanServices');
+
+        return response()->json([
+            'success' => true,
+            'data'    => $this->formatArtisan($user),
+        ]);
+    }
+
     // ==========================================
-    // 💬 MESSAGE METHODS
+    // 💬 MESSAGING
     // ==========================================
 
     /**
-     * Send a message
+     * POST /api/messages
      */
     public function sendMessage(Request $request)
     {
@@ -411,30 +462,27 @@ class ArtisanController extends Controller
     }
 
     /**
-     * Get conversation with a specific user
+     * GET /api/messages/conversation/{userId}
      */
     public function getConversation($userId)
     {
         $authId = auth()->id();
 
-        $messages = Message::where(function($q) use ($authId, $userId) {
+        $messages = Message::where(function ($q) use ($authId, $userId) {
                 $q->where('sender_id', $authId)->where('receiver_id', $userId);
             })
-            ->orWhere(function($q) use ($authId, $userId) {
+            ->orWhere(function ($q) use ($authId, $userId) {
                 $q->where('sender_id', $userId)->where('receiver_id', $authId);
             })
             ->with(['sender', 'receiver'])
             ->orderBy('created_at', 'asc')
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data'    => $messages,
-        ]);
+        return response()->json(['success' => true, 'data' => $messages]);
     }
 
     /**
-     * Get all sent messages
+     * GET /api/messages/sent
      */
     public function sentMessages()
     {
@@ -444,14 +492,11 @@ class ArtisanController extends Controller
             ->latest()
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data'    => $messages,
-        ]);
+        return response()->json(['success' => true, 'data' => $messages]);
     }
 
     /**
-     * Get all received messages
+     * GET /api/messages/received
      */
     public function receivedMessages()
     {
@@ -461,14 +506,11 @@ class ArtisanController extends Controller
             ->latest()
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data'    => $messages,
-        ]);
+        return response()->json(['success' => true, 'data' => $messages]);
     }
 
     /**
-     * Mark message as read
+     * PATCH /api/messages/{id}/read
      */
     public function markAsRead($id)
     {
@@ -486,7 +528,7 @@ class ArtisanController extends Controller
     }
 
     /**
-     * Get unread messages count
+     * GET /api/messages/unread-count
      */
     public function unreadCount()
     {
@@ -494,76 +536,38 @@ class ArtisanController extends Controller
             ->where('is_read', false)
             ->count();
 
-        return response()->json([
-            'success'      => true,
-            'unread_count' => $count,
-        ]);
+        return response()->json(['success' => true, 'unread_count' => $count]);
     }
+
     /**
- * Get all conversations (inbox)
- */
-public function allConversations()
-{
-    $authId = auth()->id();
+     * GET /api/messages/conversations
+     */
+    public function allConversations()
+    {
+        $authId = auth()->id();
 
-    $messages = Message::where('sender_id', $authId)
-        ->orWhere('receiver_id', $authId)
-        ->with(['sender', 'receiver'])
-        ->orderBy('created_at', 'desc')
-        ->get()
-        ->groupBy(function ($msg) use ($authId) {
-            // Group by the other person's ID
-            return $msg->sender_id == $authId ? $msg->receiver_id : $msg->sender_id;
-        })
-        ->map(function ($msgs) use ($authId) {
-            $lastMessage = $msgs->first();
-            $otherUser   = $lastMessage->sender_id == $authId
-                ? $lastMessage->receiver
-                : $lastMessage->sender;
+        $conversations = Message::where('sender_id', $authId)
+            ->orWhere('receiver_id', $authId)
+            ->with(['sender', 'receiver'])
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->groupBy(fn($msg) => $msg->sender_id == $authId ? $msg->receiver_id : $msg->sender_id)
+            ->map(function ($msgs) use ($authId) {
+                $last      = $msgs->first();
+                $otherUser = $last->sender_id == $authId ? $last->receiver : $last->sender;
 
-            return [
-                'user'          => $otherUser,
-                'last_message'  => $lastMessage->message,
-                'is_read'       => $lastMessage->is_read,
-                'date'          => $lastMessage->created_at,
-                'unread_count'  => $msgs->where('receiver_id', $authId)->where('is_read', false)->count(),
-            ];
-        })
-        ->values();
+                return [
+                    'user'         => $otherUser,
+                    'last_message' => $last->message,
+                    'is_read'      => $last->is_read,
+                    'date'         => $last->created_at,
+                    'unread_count' => $msgs->where('receiver_id', $authId)
+                                          ->where('is_read', false)
+                                          ->count(),
+                ];
+            })
+            ->values();
 
-    return response()->json([
-        'success' => true,
-        'data'    => $messages,
-    ]);
-}
-/**
- * GET /api/artisan/me
- */
-public function me(Request $request)
-{
-    $user = $request->user()->load('artisanProfile.medias', 'artisanServices');
-    $profile = $user->artisanProfile;
-
-    $photo = $profile?->medias->first()?->path
-        ? asset('storage/' . $profile->medias->first()->path)
-        : null;
-
-    return response()->json([
-        'success' => true,
-        'data' => [
-            'id'            => $user->id,
-            'name'          => $user->name,
-            'email'         => $user->email,
-            'phone'         => $user->phone,
-            'ville'         => $profile?->ville,
-            'description'   => $profile?->description,
-            'profile_photo' => $photo,
-
-            // In me() method, add to the data array:
-           'portfolio_images' => $profile?->medias->map(fn($m) => asset('storage/' . $m->path))->values() ?? [],
-            'services'      => $user->artisanServices->pluck('name'),
-            'is_verified'   => (bool) $user->email_verified_at && (bool) $user->phone_verified_at,
-        ],
-    ]);
-}
+        return response()->json(['success' => true, 'data' => $conversations]);
+    }
 }

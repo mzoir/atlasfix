@@ -155,10 +155,13 @@ import funfact from "@/assets/Funfact.png"
 }
 
 .big-title {
-  font-weight: 900;
-  color: #111;
-  font-size: clamp(28px, 3.2vw, 44px);
-  line-height: 1.08;
+  font-family: Poppins;
+font-weight: 600;
+font-style: Medium ;
+font-size: 40px;
+line-height: 140%;
+letter-spacing: 0%;
+  color:#030302;
 }
 
 /* ✅ Square icon wrapper */
@@ -181,16 +184,25 @@ import funfact from "@/assets/Funfact.png"
 }
 
 .feat-title {
-  font-weight: 900;
-  color: rgba(0, 0, 0, 0.84);
-  font-size: 16px;
+
+  font-family: Poppins;
+font-weight: 600;
+font-style: SemiBold;
+font-size: 20px;
+line-height: 140%;
+letter-spacing: 0%;
+  color:#030302;
 }
 
 .feat-desc {
   margin-top: 4px;
-  color: rgba(0, 0, 0, 0.55);
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 1.5;
+  font-family: Poppins;
+font-weight: 400;
+font-style: Regular;
+font-size: 16px;
+line-height: 160%;
+letter-spacing: 0%;
+
+  color: #838383;
 }
 </style>

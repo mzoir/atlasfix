@@ -447,6 +447,7 @@ public function allConversations()
 /**
  * Update user profile
  */
+
 public function update(Request $request)
 {
     $user = auth()->user();
@@ -472,5 +473,37 @@ public function update(Request $request)
         'user' => $user
     ]);
 }
+public function register(Request $request)
+{
+    // Validate incoming request
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'phone' => 'required|string',
+        'date_of_birth' => 'required|date',
+        'ville' => 'required|string',
+        'adresse' => 'nullable|string',
+        'password' => 'required|string|min:6|confirmed',
+    ]);
 
+    // Create the user
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'phone' => $request->phone,
+        'date_of_birth' => $request->date_of_birth,
+        'ville' => $request->ville,
+        'adresse' => $request->adresse,
+        'password' => bcrypt($request->password),
+    ]);
+
+    // Generate token if using Sanctum/Passport
+    $token = $user->createToken('auth_token')->plainTextToken;
+
+    // Return response
+    return response()->json([
+        'user' => $user,
+        'token' => $token,
+    ]);
+}
 }

@@ -59,26 +59,50 @@ import rightBg from "@/assets/righ.png"
 }
 
 .sec-title {
-  font-size: clamp(24px, 3vw, 36px);
-  font-weight: 900;
-  color: #111;
+  font-family: Poppins;
+font-weight: 500;
+font-style: Medium;
+font-size: 40px;
+line-height: 30px;
+letter-spacing: -0.45px;
+text-align: center;
+vertical-align: middle;
+  color: #0A0A0A;
 }
 
 .tcard {
   border-radius: 16px;
   background: #fff;
+  Width :358.91px;
+
+
+Height : 240.28px;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
   padding: 22px;
 }
 
 .name {
-  font-weight: 900;
-  color: #111;
-  font-size: 15px;
+  font-family: Poppins;
+font-weight: 600;
+font-style: bold;
+font-size: 21px;
+line-height: 27.45px;
+letter-spacing: 0.2%;
+vertical-align: bottom;
+
+  color: #0A0A0A;
 }
 
 .role {
   color: rgba(0, 0, 0, 0.45);
+  font-family: Public Sans;
+font-weight: 400;
+font-style: Regular;
+font-size: 13.73px;
+line-height: 20.59px;
+letter-spacing: 0%;
+vertical-align: bottom;
+
   font-weight: 800;
   font-size: 12px;
   margin-top: 2px;

@@ -1,14 +1,16 @@
 <template>
-  <div class="login-page">
+  <div class="login-page" :style="{ backgroundImage: `linear-gradient(rgba(255,255,255,0.93), rgba(255,255,255,0.9)), url(${funfact1})` }">
+    <img src="@/assets/hhf.png" class="corner-img" />
+    
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
     <div class="container-xxl app-shell px-3 px-md-5">
       <!-- TOP BACK -->
-      <div class="pt-3">
-        <RouterLink class="back-link" to="/">← Retour</RouterLink>
-      </div>
-
-      <!-- CARD -->
       <div class="row justify-content-center">
         <div class="col-12 col-lg-10 col-xl-8">
+          <div class="pt-3">
+            <RouterLink class="back-link" to="/">← Retour</RouterLink>
+          </div>
+
           <div class="login-card text-center">
             <div class="avatar mx-auto">H</div>
 
@@ -19,11 +21,10 @@
             <div v-if="errorMsg" class="alert alert-danger text-start mt-3 mb-0">
               {{ errorMsg }}
             </div>
-
             <!-- EMAIL -->
             <div class="text-start mt-3">
               <label class="lbl-row mb-2">
-                <span class="ico">✉️</span>
+                <span class="ico"><i class="f-ico ph ph-envelope"></i></span>
                 <span>Adresse email</span>
               </label>
               <input
@@ -38,7 +39,7 @@
             <!-- PASSWORD -->
             <div class="text-start mt-3">
               <label class="lbl-row mb-2">
-                <span class="ico">🔒</span>
+                <span class="ico"><i class="f-ico ph ph-lock"></i></span>
                 <span>Mot de passe</span>
               </label>
 
@@ -57,9 +58,7 @@
             </div>
 
             <!-- remember/forgot -->
-            <div
-              class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 mt-3"
-            >
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2 mt-3">
               <label class="remember">
                 <input v-model="remember" class="form-check-input mt-0" type="checkbox" />
                 <span>Se souvenir de moi</span>
@@ -69,11 +68,7 @@
             </div>
 
             <!-- primary -->
-            <button
-              class="btn primary-btn w-100 mt-3"
-              :disabled="loading"
-              @click="login"
-            >
+            <button class="btn primary-btn w-100 mt-3" :disabled="loading" @click="login">
               <span v-if="!loading">Se connecter</span>
               <span v-else>Connexion...</span>
             </button>
@@ -85,17 +80,17 @@
               <div class="hr"></div>
             </div>
 
-            <!-- social (unchanged UI) -->
+            <!-- social (with images) -->
             <button class="btn pill-btn pill-orange w-100" type="button">
-              ✉️ <span>S'inscrire avec l'application</span>
+              <img :src="app" alt="App" class="social-img" /> <span>S'inscrire avec l'application</span>
             </button>
 
-            <button class="btn pill-btn pill-white w-100 mt-2" type="button"    @click="loginWithGoogle">
-              <span class="g">G</span> <span>Continuer avec Google</span>
+            <button class="btn pill-btn pill-white w-100 mt-2" type="button" @click="loginWithGoogle">
+              <img :src="gmail" alt="Gmail" class="social-img" /> <span>Continuer avec Google</span>
             </button>
 
             <button class="btn pill-btn pill-white w-100 mt-2" type="button">
-              <span class="f">f</span> <span>Continuer avec Facebook</span>
+              <img :src="face" alt="Facebook" class="social-img" /> <span>Continuer avec Facebook</span>
             </button>
 
             <div class="bottom-link mt-3">
@@ -116,10 +111,13 @@ import { ref } from "vue"
 import { RouterLink, useRouter } from "vue-router"
 import axios from "axios"
 
+import funfact1 from "@/assets/worker.jpg"
+import gmail from "@/assets/gmail1.png"
+import face from "@/assets/Vector(2).png"
+import app from "@/assets/Vector(1).png"
+
 const router = useRouter()
 
-// ✅ Change this to your backend base URL
-// Example: "http://127.0.0.1:8000" or "https://api.atlasfix.ma"
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000"
 
 const email = ref("")
@@ -130,16 +128,14 @@ const showPwd = ref(false)
 const loading = ref(false)
 const errorMsg = ref("")
 
-// optional: keep axios config centralized
 const api = axios.create({
   baseURL: API_BASE,
   headers: { Accept: "application/json" },
-  withCredentials: false, // set true only if you use Sanctum cookies
+  withCredentials: false,
 })
 
 async function login() {
   errorMsg.value = ""
-
   if (!email.value || !password.value) {
     errorMsg.value = "Veuillez remplir l'email et le mot de passe."
     return
@@ -153,29 +149,21 @@ async function login() {
       remember: remember.value,
     })
 
-    // ✅ adjust if your API returns access_token instead of token
     const token = res?.data?.token || res?.data?.access_token
-    if (!token) {
-      throw new Error("Token manquant dans la réponse API.")
-    }
+    if (!token) throw new Error("Token manquant dans la réponse API.")
 
     localStorage.setItem("token", token)
-    // optional
     if (res?.data?.user) localStorage.setItem("user", JSON.stringify(res.data.user))
 
-    // Set default Authorization for future requests
     api.defaults.headers.common.Authorization = `Bearer ${token}`
     axios.defaults.headers.common.Authorization = `Bearer ${token}`
 
-    // redirect where you want
     window.location.href = "/"
   } catch (err) {
-    // Laravel validation / auth errors usually are here
     const status = err?.response?.status
     const data = err?.response?.data
 
     if (status === 422 && data?.errors) {
-      // show first validation error
       const firstKey = Object.keys(data.errors)[0]
       errorMsg.value = data.errors[firstKey]?.[0] || "Données invalides."
     } else if (status === 401) {
@@ -189,88 +177,110 @@ async function login() {
 }
 
 function loginWithGoogle() {
-  // This route must exist in Laravel: /auth/google/redirect
   window.location.href = `${API_BASE}/auth/google/redirect`
 }
 </script>
 
 <style scoped>
-/* page spacing under fixed header */
-.login-page{
+.login-page {
+ z-index: 0; /* important */
+  position: relative;
   padding-top: 102px;
-  padding-bottom: 12px;
+  padding-bottom: 50px;
+  background-position: right ;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* gradient overlay */
+.login-page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* back link */
-.back-link{
+.back-link {
+  font-family: "Inter";
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: -0.31px;
+  text-align: center;
   text-decoration: none;
-  color: rgba(0,0,0,0.65);
-  font-weight: 800;
+  color: rgba(98, 116, 142, 1);
 }
 
-/* card (responsive width comes from bootstrap cols) */
-.login-card{
+.f-ico {
+  color: #ff5a1f;
+  font-size: 17px;
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
+  line-height: 1;
+}
+
+/* card */
+.login-card {
+    z-index: 3;
   background: #fff;
   border-radius: 18px;
   box-shadow: 0 18px 50px rgba(0,0,0,0.12);
   padding: 28px 20px;
   margin-top: 14px;
 }
-@media (min-width: 768px){
-  .login-card{ padding: 34px 70px 28px; }
-}
 
 /* avatar */
-.avatar{
+.avatar {
   width: 56px;
   height: 56px;
   border-radius: 14px;
   background: #fc5a15;
   color: #fff;
-  font-weight: 900;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
+  font-size: 30px;
+  line-height: 36px;
 }
 
 /* typography */
-.title{
+.title {
   margin: 0;
-  font-size: clamp(32px, 4vw, 44px);
-  color: #1f2a44;
-  font-weight: 900;
+  color: rgba(49, 65, 88, 1);
+  font-size: 30px;
 }
-.sub{
+.sub {
   margin: 8px 0 0;
-  color: rgba(31,42,68,0.65);
-  font-weight: 700;
+  color: rgba(98, 116, 142, 1);
+  font-size: 16px;
 }
 
 /* labels */
-.lbl-row{
+.lbl-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: rgba(31,42,68,0.85);
-  font-weight: 800;
+  color: rgba(49, 65, 88, 1);
 }
-.ico{ color: #fc5a15; }
+.ico { color: #fc5a15; }
 
-/* inputs (bootstrap form-control + our look) */
-.inp{
+/* inputs */
+.inp {
   height: 52px;
   border-radius: 10px;
   border: 1px solid rgba(0,0,0,0.18);
   font-weight: 700;
 }
-.inp:focus{
+.inp:focus {
   border-color: rgba(252,90,21,0.8);
   box-shadow: 0 0 0 4px rgba(252,90,21,0.12);
 }
 
 /* eye button */
-.eye-btn{
+.eye-btn {
   position: absolute;
   right: 10px;
   top: 50%;
@@ -281,78 +291,59 @@ function loginWithGoogle() {
   opacity: 0.75;
 }
 
-/* remember */
-.remember{
-  display: inline-flex;
-  gap: 10px;
-  align-items: center;
-  color: rgba(31,42,68,0.75);
-  font-weight: 800;
-}
+/* remember/forgot */
+.remember { display: inline-flex; gap: 10px; align-items: center; }
+.forgot { color: #fc5a15; text-decoration: none; }
 
-/* forgot */
-.forgot{
-  color: #fc5a15;
-  text-decoration: none;
-  font-weight: 900;
-}
-
-/* primary */
-.primary-btn{
+/* primary button */
+.primary-btn {
   height: 56px;
   border-radius: 10px;
-  border: 2px solid #fc5a15;
+  border: 1px solid #fc5a15;
   background: #fff;
-  color: #fc5a15;
-  font-weight: 900;
-  font-size: 18px;
+  color: rgba(252, 90, 21, 1);
 }
-.primary-btn:hover{
-  background: rgba(252,90,21,0.06);
-}
+.primary-btn:hover { background: rgba(252,90,21,0.06); }
 
 /* OR line */
-.or-row{
-  display:flex;
-  align-items:center;
-  gap: 14px;
+.or-row { display: flex; align-items: center; gap: 14px; }
+.hr { flex: 1; height: 1px; background: rgba(0,0,0,0.12); }
+.or-txt { color: rgba(0,0,0,0.5); font-weight: 900; }
+
+/* corner image */
+.corner-img {
+
+  z-index: -1; /* 🔥 key fix */
+  position: absolute;
+  bottom: 2px;
+  right: 0;
+  height: auto;
+  width: auto;
+  max-width: 641px;
+min-height: 565px;
+opacity: 1;
+       /* 🔥 behind */
+  pointer-events: none; /* no click issues */
+
 }
-.hr{ flex:1; height:1px; background: rgba(0,0,0,0.12); }
-.or-txt{ color: rgba(0,0,0,0.5); font-weight: 900; }
 
 /* pills */
-.pill-btn{
+.pill-btn {
   height: 54px;
   border-radius: 10px;
-  border: 1px solid rgba(0,0,0,0.18);
-  font-weight: 900;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
+  font-size: 16px;
 }
-.pill-orange{
-  background: #fc5a15;
-  border-color: #fc5a15;
-  color: #fff;
-}
-.pill-white{
-  background: #fff;
-  color: rgba(31,42,68,0.85);
-}
+.pill-orange { background: #fc5a15; color: #fff; border-color: #fc5a15; }
+.pill-white { background: #fff; color: rgba(31,42,68,0.85); border: 1px solid rgba(0,0,0,0.18); }
 
-/* letters */
-.g{ font-weight: 900; color: #ea4335; }
-.f{ font-weight: 900; color: #1877f2; }
+/* social images */
+.social-img { width: 24px; height: 24px; object-fit: contain; }
 
 /* bottom link */
-.bottom-link{
-  color: rgba(31,42,68,0.7);
-  font-weight: 800;
-}
-.bottom-link a{
-  color:#fc5a15;
-  text-decoration:none;
-  font-weight: 900;
-}
+.bottom-link { font-size: 16px; color: rgba(31,42,68,0.7); text-align: center; }
+.bottom-link a { color: #fc5a15; text-decoration: none; }
 </style>
